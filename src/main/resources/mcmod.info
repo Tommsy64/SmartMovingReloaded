@@ -1,0 +1,16 @@
+[
+{
+  "modid": "${modid}",
+  "name": "${name}",
+  "description": "${description}",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "${url}",
+  "updateUrl": "",
+  "authorList": ["Tommsy64"],
+  "credits": "Divisor for creating the original PlayerAPI",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

@@ -1,0 +1,179 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = 'forge'
+            url = 'http://files.minecraftforge.net/maven'
+        }
+        maven {
+            name = 'sponge'
+            url = 'http://repo.spongepowered.org/maven'
+        }
+    }
+    dependencies {
+        classpath "net.minecraftforge.gradle:ForgeGradle:${project.forgeGradleVersion}"
+        classpath 'org.spongepowered:mixingradle:0.6+'
+    }
+}
+
+plugins {
+    id "com.diffplug.gradle.spotless" version "3.13.0"
+    id "com.github.johnrengelman.shadow" version "2.0.4"
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
+
+file "build.properties" withReader {
+    def prop = new Properties()
+    prop.load(it)
+    ext.config = new ConfigSlurper().parse prop
+}
+
+ext.simpleVersion = "${config.mixinplayerapi.version}"
+version = "${config.minecraft.version}-${project.simpleVersion}"
+group = "com.tommsy.playerapi"
+archivesBaseName = project.name
+
+sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
+
+defaultTasks 'spotlessApply', 'build'
+
+minecraft {
+    version = "${config.minecraft.version}-${config.forge.version}"
+    runDir = 'run'
+
+    // snapshot_YYYYMMDD   snapshot are built nightly.
+    // stable_#            stables are built at the discretion of the MCP team.
+    mappings = "${config.minecraft.mappings}"
+
+    replace '@NAME@', project.name
+    replace '@MODID@', project.name.toLowerCase()
+    replace '@VERSION@', project.simpleVersion
+    replace '@MCVERSION@', config.minecraft.version
+
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+}
+
+repositories {
+    maven {
+        name = 'sponge'
+        url = 'http://repo.spongepowered.org/maven'
+    }
+}
+
+dependencies {
+    compile('org.spongepowered:mixin:0.7.5-SNAPSHOT') {
+        exclude module: 'asm-commons'
+        exclude module: 'asm-tree'
+        exclude module: 'launchwrapper'
+        exclude module: 'guava'
+        exclude module: 'log4j-core'
+    }
+}
+
+sourceSets {
+    main {
+        refMap = "mixins.mixinplayerapi.refmap.json"
+    }
+}
+
+jar {
+    classifier 'base'
+
+    manifest {
+        attributes(
+                'Built-By': System.properties['user.name'],
+                'Created-By': System.properties['java.vm.version'] + ' (' + System.properties['java.vm.vendor'] + ')',
+                'Implementation-Title': project.name,
+                'Implementation-Version': version,
+                "Implementation-Vendor": url,
+                'FMLCorePlugin': project.group + '.core.MixinPlayerAPIPlugin',
+                'FMLCorePluginContainsFMLMod': 'true',
+                "ForceLoadAsMod": true,
+                'MixinConfigs': [
+                        'mixins.mixinplayerapi.core.json'
+                ].join(','),
+                'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+                'TweakOrder': 0
+        )
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property 'version', project.version
+    inputs.property 'mcversion', project.minecraft.version
+    inputs.property 'url', project.url
+    inputs.property 'description', project.description
+    inputs.property 'name', project.name
+    inputs.property 'modid', project.name.toLowerCase()
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        // replace version and mcversion
+        expand 'version': project.simpleVersion, 'mcversion': project.minecraft.version, 'url': project.url, 'description': project.description, 'name': project.name, 'modid': project.name.toLowerCase()
+    }
+    // copy everything else except the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+
+shadowJar {
+    // Clear the current source set
+    // TODO: Find a better way for this, will likely break in the future
+    mainSpec.sourcePaths.clear()
+    dependsOn reobfJar
+    classifier ''
+    dependencies {
+        include dependency('org.spongepowered:mixin')
+    }
+
+    // Exclude ForgeGradle classes from shaded JAR
+    exclude 'dummyThing'
+
+    // Wait for reobf task to be fully configured
+    afterEvaluate {
+        // Include obfuscated classes
+        from zipTree(reobfJar.jar)
+    }
+}
+
+artifacts {
+    archives shadowJar
+}
+
+spotless {
+    java {
+        licenseHeaderFile 'spotless/license-header.txt'
+        removeUnusedImports()
+        // XML file dumped out by the Eclipse formatter
+        eclipse().configFile 'spotless/spotless.eclipseformat.xml'
+        trimTrailingWhitespace()
+    }
+    format 'misc', {
+        target '**/.gitignore', "**/*.properties", "*.gradle"
+        indentWithSpaces()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    freshmark {
+        target '*.md'
+    }
+    // The default value of PLATFORM_NATIVE is recommended (can be WINDOWS, UNIX, or PLATFORM_NATIVE)
+    lineEndings 'PLATFORM_NATIVE'
+}

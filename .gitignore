@@ -1,0 +1,27 @@
+# Gradle
+/.gradle
+/build
+classes/
+
+# Eclipse
+/.classpath
+/.project
+/.settings
+/bin
+
+# IntelliJ IDEA
+/*.iml
+/*.ipr
+/*.iws
+/.idea
+/out
+
+# Debugging
+/eclipse
+/run
+
+# OS X
+.DS_Store
+
+# Forge
+*.launch
