@@ -80,7 +80,7 @@ dependencies {
 
 sourceSets {
     main {
-        refMap = "mixins.mixinplayerapi.refmap.json"
+        ext.refMap = "mixins.mixinplayerapi.refmap.json"
     }
 }
 
