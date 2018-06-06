@@ -1,9 +1,9 @@
 {
-    "package": "com.tommsy.playerapi.mixin",
-    "refmap": "mixins.mixinplayerapi.refmap.json",
+    "package": "com.tommsy.smartmoving.mixin",
+    "refmap": "mixins.smartmoving.refmap.json",
     "target": "@env(DEFAULT)",
     "compatibilityLevel": "JAVA_8",
-    "minVersion": "0.7.5"
+    "minVersion": "0.7.5",
     "mixins": [
         "MixinEntityPlayer",
         "client.MixinAbstractClientPlayer",

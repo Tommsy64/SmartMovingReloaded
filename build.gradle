@@ -12,7 +12,7 @@ buildscript {
     }
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:${project.forgeGradleVersion}"
-        classpath 'org.spongepowered:mixingradle:0.6+'
+        classpath "org.spongepowered:mixingradle:${project.mixinGradleVersion}"
     }
 }
 
@@ -33,9 +33,9 @@ file "build.properties" withReader {
     ext.config = new ConfigSlurper().parse prop
 }
 
-ext.simpleVersion = "${config.mixinplayerapi.version}"
+ext.simpleVersion = "${config.smartmoving.version}"
 version = "${config.minecraft.version}-${project.simpleVersion}"
-group = "com.tommsy.playerapi"
+group = 'com.tommsy.smartmoving'
 archivesBaseName = project.name
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
@@ -53,8 +53,8 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     mappings = "${config.minecraft.mappings}"
 
-    replace '@NAME@', project.name
-    replace '@MODID@', project.name.toLowerCase()
+    replace '@NAME@', project.ext.name
+    replace '@MODID@', project.modid
     replace '@VERSION@', project.simpleVersion
     replace '@MCVERSION@', config.minecraft.version
 
@@ -80,7 +80,7 @@ dependencies {
 
 sourceSets {
     main {
-        ext.refMap = "mixins.mixinplayerapi.refmap.json"
+        ext.refMap = "mixins.smartmoving.refmap.json"
     }
 }
 
@@ -94,11 +94,11 @@ jar {
                 'Implementation-Title': project.name,
                 'Implementation-Version': version,
                 "Implementation-Vendor": url,
-                'FMLCorePlugin': project.group + '.core.MixinPlayerAPIPlugin',
+                'FMLCorePlugin': project.group + '.core.SmartMovingPlugin',
                 'FMLCorePluginContainsFMLMod': 'true',
                 "ForceLoadAsMod": true,
                 'MixinConfigs': [
-                        'mixins.mixinplayerapi.core.json'
+                        'mixins.smartmoving.core.json'
                 ].join(','),
                 'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
                 'TweakOrder': 0
@@ -116,15 +116,15 @@ processResources {
     inputs.property 'mcversion', project.minecraft.version
     inputs.property 'url', project.url
     inputs.property 'description', project.description
-    inputs.property 'name', project.name
-    inputs.property 'modid', project.name.toLowerCase()
+    inputs.property 'name', project.ext.name
+    inputs.property 'modid', project.modid
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
 
         // replace version and mcversion
-        expand 'version': project.simpleVersion, 'mcversion': project.minecraft.version, 'url': project.url, 'description': project.description, 'name': project.name, 'modid': project.name.toLowerCase()
+        expand 'version': project.simpleVersion, 'mcversion': project.minecraft.version, 'url': project.url, 'description': project.description, 'name': project.ext.name, 'modid': project.modid
     }
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {

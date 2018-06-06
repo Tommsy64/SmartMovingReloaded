@@ -1,2 +1,2 @@
-Mixin Player API
-================
+Smart Moving Reloaded
+=====================
