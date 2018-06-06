@@ -16,13 +16,15 @@
 * along with Mixin Player API.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.playerapi.mixin;
+package com.tommsy.playerapi.mixin.server;
 
 import org.spongepowered.asm.mixin.Mixin;
+
+import com.tommsy.playerapi.mixin.MixinEntityPlayer;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 
 @Mixin(EntityPlayerMP.class)
-public abstract class MixinEntityPlayerMP {
+public abstract class MixinEntityPlayerMP extends MixinEntityPlayer {
 
 }

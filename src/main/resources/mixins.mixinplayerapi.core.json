@@ -3,7 +3,11 @@
     "refmap": "mixins.mixinplayerapi.refmap.json",
     "target": "@env(DEFAULT)",
     "compatibilityLevel": "JAVA_8",
+    "minVersion": "0.7.5"
     "mixins": [
-        "MixinEntityPlayerMP"
+        "MixinEntityPlayer",
+        "client.MixinAbstractClientPlayer",
+        "client.MixinEntityPlayerSP",
+        "server.MixinEntityPlayerMP"
     ]
 }
