@@ -19,10 +19,42 @@
 package com.tommsy.smartmoving.mixin.client;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import com.tommsy.smartmoving.SmartMovingMod;
+import com.tommsy.smartmoving.SmartMovingMod.ClientProxy;
+import com.tommsy.smartmoving.client.SmartMovingClientPlayer;
+import com.tommsy.smartmoving.client.SmartMovingClientPlayerHandler;
 
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.world.World;
 
 @Mixin(EntityPlayerSP.class)
-public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer {
+public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer implements SmartMovingClientPlayer {
 
+    protected MixinEntityPlayerSP(World worldIn) {
+        super(worldIn);
+    }
+
+    private SmartMovingClientPlayerHandler playerHandler;
+
+    @Inject(method = "<init>*", at = @At("RETURN"))
+    private void onConstructed(CallbackInfo ci) {
+        playerHandler = new SmartMovingClientPlayerHandler(this);
+    }
+
+    public SmartMovingClientPlayerHandler getPlayerHandler() {
+        return this.playerHandler;
+    }
+
+    @Inject(method = "updateEntityActionState", at = @At("HEAD"), cancellable = true)
+    private void updateEntityActionState(CallbackInfo cir) {
+        SmartMovingMod.logger.info("Update EntityPlayerSP!!!");
+        if (((ClientProxy) SmartMovingMod.proxy).keyBindGrab.isKeyDown()) {
+            cir.cancel();
+            SmartMovingMod.logger.info("Cancelled.");
+        }
+    }
 }

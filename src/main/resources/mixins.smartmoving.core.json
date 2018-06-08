@@ -9,5 +9,12 @@
         "client.MixinAbstractClientPlayer",
         "client.MixinEntityPlayerSP",
         "server.MixinEntityPlayerMP"
-    ]
+    ],
+    "client": [
+        "client.MixinRenderPlayer",
+        "client.MixinModelPlayer"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
 }

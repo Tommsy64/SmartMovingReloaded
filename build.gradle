@@ -25,7 +25,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
-
+apply plugin: 'eclipse'
 
 file "build.properties" withReader {
     def prop = new Properties()
@@ -57,6 +57,7 @@ minecraft {
     replace '@MODID@', project.modid
     replace '@VERSION@', project.simpleVersion
     replace '@MCVERSION@', config.minecraft.version
+    replace "/* @MCVERSIONDEP@ */", ", acceptedMinecraftVersions = \"[${config.minecraft.version},${config.minecraft.version}+)\""
 
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
@@ -69,7 +70,7 @@ repositories {
 }
 
 dependencies {
-    compile('org.spongepowered:mixin:0.7.5-SNAPSHOT') {
+    compile('org.spongepowered:mixin:0.7.8-SNAPSHOT') {
         exclude module: 'asm-commons'
         exclude module: 'asm-tree'
         exclude module: 'launchwrapper'
@@ -95,13 +96,13 @@ jar {
                 'Implementation-Version': version,
                 "Implementation-Vendor": url,
                 'FMLCorePlugin': project.group + '.core.SmartMovingPlugin',
-                'FMLCorePluginContainsFMLMod': 'true',
-                "ForceLoadAsMod": true,
+                // 'FMLCorePluginContainsFMLMod': 'true', // Seems to cause mod to not load in dev environment
+                'ForceLoadAsMod': true,
+                'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+                'TweakOrder': 0,
                 'MixinConfigs': [
                         'mixins.smartmoving.core.json'
-                ].join(','),
-                'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-                'TweakOrder': 0
+                ].join(',')
         )
     }
 }
@@ -176,4 +177,15 @@ spotless {
     }
     // The default value of PLATFORM_NATIVE is recommended (can be WINDOWS, UNIX, or PLATFORM_NATIVE)
     lineEndings 'PLATFORM_NATIVE'
+}
+
+eclipse {
+    classpath {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+runClient {
+    jvmArgs '-Dmixin.debug=true'
 }

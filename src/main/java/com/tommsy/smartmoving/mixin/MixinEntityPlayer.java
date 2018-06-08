@@ -20,9 +20,15 @@ package com.tommsy.smartmoving.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 
 @Mixin(EntityPlayer.class)
-public abstract class MixinEntityPlayer {
+public abstract class MixinEntityPlayer extends EntityLivingBase {
+
+    protected MixinEntityPlayer(World worldIn) {
+        super(worldIn);
+    }
 
 }

@@ -16,20 +16,6 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.mixin.client;
+package com.tommsy.smartmoving.client;
 
-import org.spongepowered.asm.mixin.Mixin;
-
-import com.tommsy.smartmoving.mixin.MixinEntityPlayer;
-
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.world.World;
-
-@Mixin(AbstractClientPlayer.class)
-public abstract class MixinAbstractClientPlayer extends MixinEntityPlayer {
-
-    protected MixinAbstractClientPlayer(World worldIn) {
-        super(worldIn);
-    }
-
-}
+public interface SmartMovingClientPlayer {}

@@ -19,27 +19,60 @@
 package com.tommsy.smartmoving;
 
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.input.Keyboard;
 
+import com.tommsy.smartmoving.client.SmartMovingClientEventHandler;
+import com.tommsy.smartmoving.network.SmartMovingNetworkHandler;
+
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 
-@Mod(modid = SmartMovingMod.MODID, name = SmartMovingMod.NAME, version = SmartMovingMod.VERSION, acceptedMinecraftVersions = "[1.12,1.13)")
+@Mod(modid = SmartMovingInfo.MODID, name = SmartMovingInfo.NAME, version = SmartMovingInfo.VERSION/* @MCVERSIONDEP@ */)
 public class SmartMovingMod {
-    public static final String MODID = "@MODID@";
-    public static final String NAME = "@NAME@";
-    public static final String VERSION = "@VERSION@";
-
     public static Logger logger;
 
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        logger = event.getModLog();
+    @SidedProxy(serverSide = "com.tommsy.smartmoving.SmartMovingMod$CommonProxy", clientSide = "com.tommsy.smartmoving.SmartMovingMod$ClientProxy")
+    public static CommonProxy proxy;
+
+    public static class CommonProxy {
+        public void preInit(FMLPreInitializationEvent event) {
+            logger = event.getModLog();
+        }
+
+        public void init(FMLInitializationEvent event) {
+            NetworkRegistry.INSTANCE.newEventDrivenChannel(SmartMovingInfo.NETWORK_ID).register(new SmartMovingNetworkHandler());
+        }
+    }
+
+    public static class ClientProxy extends CommonProxy {
+        public KeyBinding keyBindGrab;
+
+        @Override
+        public void init(FMLInitializationEvent event) {
+            super.init(event);
+
+            keyBindGrab = new KeyBinding("key.grab.desc", Keyboard.KEY_R, "key.categories.movement");
+
+            ClientRegistry.registerKeyBinding(keyBindGrab);
+
+            MinecraftForge.EVENT_BUS.register(new SmartMovingClientEventHandler());
+        }
     }
 
     @EventHandler
-    public void init(FMLInitializationEvent event) {
+    public static void preInit(FMLPreInitializationEvent event) {
+        proxy.preInit(event);
+    }
 
+    @EventHandler
+    public static void init(FMLInitializationEvent event) {
+        proxy.init(event);
     }
 }

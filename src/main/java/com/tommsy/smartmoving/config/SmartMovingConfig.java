@@ -16,20 +16,23 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.mixin.client;
+package com.tommsy.smartmoving.config;
 
-import org.spongepowered.asm.mixin.Mixin;
+import com.tommsy.smartmoving.SmartMovingInfo;
 
-import com.tommsy.smartmoving.mixin.MixinEntityPlayer;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.Config.Name;
 
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.world.World;
+@Config(modid = SmartMovingInfo.MODID, name = SmartMovingInfo.CONFIG_FILE_NAME)
+public final class SmartMovingConfig {
 
-@Mixin(AbstractClientPlayer.class)
-public abstract class MixinAbstractClientPlayer extends MixinEntityPlayer {
+    @Name("Subcat Name")
+    public static SubCategory subcat = new SubCategory();
 
-    protected MixinAbstractClientPlayer(World worldIn) {
-        super(worldIn);
+    private static class SubCategory {
+        public boolean someBool;
+        public int relatedInt;
     }
 
+    private SmartMovingConfig() {}
 }

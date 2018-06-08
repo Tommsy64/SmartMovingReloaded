@@ -16,20 +16,17 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.mixin.client;
+package com.tommsy.smartmoving;
 
-import org.spongepowered.asm.mixin.Mixin;
+public final class SmartMovingInfo {
+    public static final String MODID = "@MODID@";
+    public static final String NAME = "@NAME@";
+    public static final String VERSION = "@VERSION@";
 
-import com.tommsy.smartmoving.mixin.MixinEntityPlayer;
+    public static final String COMMUNICATION_VERSION = "0.0.1";
+    public static final String NETWORK_ID = "SmrtMvng|" + COMMUNICATION_VERSION;
 
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.world.World;
+    public static final String CONFIG_FILE_NAME = "SmartMoving";
 
-@Mixin(AbstractClientPlayer.class)
-public abstract class MixinAbstractClientPlayer extends MixinEntityPlayer {
-
-    protected MixinAbstractClientPlayer(World worldIn) {
-        super(worldIn);
-    }
-
+    private SmartMovingInfo() {}
 }

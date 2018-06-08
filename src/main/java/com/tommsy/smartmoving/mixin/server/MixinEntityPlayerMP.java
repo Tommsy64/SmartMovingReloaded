@@ -19,12 +19,33 @@
 package com.tommsy.smartmoving.mixin.server;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.tommsy.smartmoving.mixin.MixinEntityPlayer;
+import com.tommsy.smartmoving.server.SmartMovingServerPlayer;
+import com.tommsy.smartmoving.server.SmartMovingServerPlayerHandler;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.world.World;
 
 @Mixin(EntityPlayerMP.class)
-public abstract class MixinEntityPlayerMP extends MixinEntityPlayer {
+public abstract class MixinEntityPlayerMP extends MixinEntityPlayer implements SmartMovingServerPlayer {
+
+    protected MixinEntityPlayerMP(World worldIn) {
+        super(worldIn);
+    }
+
+    private SmartMovingServerPlayerHandler playerHandler;
+
+    @Inject(method = "<init>*", at = @At("RETURN"), require = 1)
+    private void onConstructed(CallbackInfo ci) {
+        playerHandler = new SmartMovingServerPlayerHandler(this);
+    }
+
+    public SmartMovingServerPlayerHandler getPlayerHandler() {
+        return this.playerHandler;
+    }
 
 }
