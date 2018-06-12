@@ -28,14 +28,9 @@ import com.tommsy.smartmoving.server.SmartMovingServerPlayer;
 import com.tommsy.smartmoving.server.SmartMovingServerPlayerHandler;
 
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.World;
 
 @Mixin(EntityPlayerMP.class)
 public abstract class MixinEntityPlayerMP extends MixinEntityPlayer implements SmartMovingServerPlayer {
-
-    protected MixinEntityPlayerMP(World worldIn) {
-        super(worldIn);
-    }
 
     private SmartMovingServerPlayerHandler playerHandler;
 
@@ -44,6 +39,7 @@ public abstract class MixinEntityPlayerMP extends MixinEntityPlayer implements S
         playerHandler = new SmartMovingServerPlayerHandler(this);
     }
 
+    @Override
     public SmartMovingServerPlayerHandler getPlayerHandler() {
         return this.playerHandler;
     }

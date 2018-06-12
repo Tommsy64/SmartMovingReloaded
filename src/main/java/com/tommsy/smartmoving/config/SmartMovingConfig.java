@@ -23,6 +23,10 @@ import com.tommsy.smartmoving.SmartMovingInfo;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Name;
 
+/**
+ * do not set the config variables client-side. Instead have two sets of config variables, the server set (always updated from the config file) and the client set (always received from the
+ * server).
+ */
 @Config(modid = SmartMovingInfo.MODID, name = SmartMovingInfo.CONFIG_FILE_NAME)
 public final class SmartMovingConfig {
 

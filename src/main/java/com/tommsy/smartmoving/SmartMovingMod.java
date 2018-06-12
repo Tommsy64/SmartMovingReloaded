@@ -33,6 +33,8 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod(modid = SmartMovingInfo.MODID, name = SmartMovingInfo.NAME, version = SmartMovingInfo.VERSION/* @MCVERSIONDEP@ */)
 public class SmartMovingMod {
@@ -40,6 +42,12 @@ public class SmartMovingMod {
 
     @SidedProxy(serverSide = "com.tommsy.smartmoving.SmartMovingMod$CommonProxy", clientSide = "com.tommsy.smartmoving.SmartMovingMod$ClientProxy")
     public static CommonProxy proxy;
+
+    /**
+     * Utility field so that casting to {@linkplain ClientProxy } isn't needed every time.
+     */
+    @SideOnly(Side.CLIENT)
+    public static ClientProxy clientProxy;
 
     public static class CommonProxy {
         public void preInit(FMLPreInitializationEvent event) {
@@ -53,6 +61,12 @@ public class SmartMovingMod {
 
     public static class ClientProxy extends CommonProxy {
         public KeyBinding keyBindGrab;
+
+        @Override
+        public void preInit(FMLPreInitializationEvent event) {
+            clientProxy = this;
+            super.preInit(event);
+        }
 
         @Override
         public void init(FMLInitializationEvent event) {

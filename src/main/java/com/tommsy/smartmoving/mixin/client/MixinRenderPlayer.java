@@ -19,10 +19,75 @@
 package com.tommsy.smartmoving.mixin.client;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.tommsy.smartmoving.common.SmartMovingPlayer;
+import com.tommsy.smartmoving.common.SmartMovingPlayerHandler;
+import com.tommsy.smartmoving.common.SmartMovingPlayerHandler.SmartMovingRenderState;
+
+import net.minecraft.block.Block;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 
 @Mixin(RenderPlayer.class)
 public class MixinRenderPlayer {
 
+    @Inject(method = "doRender", at = @At("HEAD"))
+    private void doRender(AbstractClientPlayer entityClientPlayer, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
+        SmartMovingPlayer smPlayer = (SmartMovingPlayer) entityClientPlayer;
+        SmartMovingPlayerHandler handle = smPlayer.getPlayerHandler();
+
+        boolean isInventory = x == 0 && y == 0 && z == 0 && entityYaw == 0 && partialTicks == 1.0;
+
+        SmartMovingRenderState renderState = handle.getAndUpdateRenderState();
+
+        SmartStatistics statistics = SmartStatisticsFactory.getInstance(entityplayer);
+        float currentHorizontalSpeedFlattened = statistics != null ? statistics.getCurrentHorizontalSpeedFlattened(partialTicks, -1) : Float.NaN;
+        float smallOverGroundHeight = renderState.crawlClimb || renderState.headJump ? (float) handle.getOverGroundHeight(5D) : 0F;
+        Block overGroundBlock = renderState.headJump && smallOverGroundHeight < 5F ? handle.getOverGroundBlockId(smallOverGroundHeight) : null;
+
+        IModelPlayer[] modelPlayers = irp.getMovingModels();
+
+        for (int i = 0; i < modelPlayers.length; i++) {
+            SmartMovingModel modelPlayer = modelPlayers[i].getMovingModel();
+            modelPlayer.isClimb = isClimb;
+            modelPlayer.isClimbJump = isClimbJump;
+            modelPlayer.handsClimbType = handsClimbType;
+            modelPlayer.feetClimbType = feetClimbType;
+            modelPlayer.isHandsVineClimbing = isHandsVineClimbing;
+            modelPlayer.isFeetVineClimbing = isFeetVineClimbing;
+            modelPlayer.isCeilingClimb = isCeilingClimb;
+            modelPlayer.isSwim = isSwim;
+            modelPlayer.isDive = isDive;
+            modelPlayer.isCrawl = isCrawl;
+            modelPlayer.isCrawlClimb = isCrawlClimb;
+            modelPlayer.isJump = isJump;
+            modelPlayer.isHeadJump = isHeadJump;
+            modelPlayer.isSlide = isSlide;
+            modelPlayer.isFlying = isFlying;
+            modelPlayer.isLevitate = isLevitate;
+            modelPlayer.isFalling = isFalling;
+            modelPlayer.isGenericSneaking = isGenericSneaking;
+            modelPlayer.isAngleJumping = isAngleJumping;
+            modelPlayer.angleJumpType = angleJumpType;
+
+            modelPlayer.currentHorizontalSpeedFlattened = currentHorizontalSpeedFlattened;
+            modelPlayer.smallOverGroundHeight = smallOverGroundHeight;
+            modelPlayer.overGroundBlock = overGroundBlock;
+        }
+
+        if (!isInventory && entityClientPlayer.isSneaking() && !(entityClientPlayer instanceof EntityPlayerSP) && renderState.crawl)
+            y += 0.125D;
+
+        CurrentMainModel = modelBipedMain;
+        irp.superRenderDoRender(entityClientPlayer, x, y, z, entityYaw, partialTicks);
+        CurrentMainModel = null;
+
+        if (moving != null && renderState.levitate && modelPlayers != null)
+            for (int i = 0; i < modelPlayers.length; i++)
+                modelPlayers[i].getMovingModel().md.currentHorizontalAngle = modelPlayers[i].getMovingModel().md.currentCameraAngle;
+    }
 }

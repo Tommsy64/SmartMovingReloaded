@@ -16,19 +16,8 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.mixin;
+package com.tommsy.smartmoving.common;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.PlayerCapabilities;
-
-@Mixin(EntityPlayer.class)
-public abstract class MixinEntityPlayer extends MixinEntityLivingBase {
-    @Shadow
-    protected void jump() {}
-
-    @Shadow
-    public PlayerCapabilities capabilities;
+public interface SmartMovingPlayer extends SmartMovingEntity {
+    public SmartMovingPlayerHandler getPlayerHandler();
 }

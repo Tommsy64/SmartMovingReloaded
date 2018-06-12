@@ -18,11 +18,56 @@
 
 package com.tommsy.smartmoving.client;
 
-public class SmartMovingClientPlayerHandler {
+import com.tommsy.smartmoving.common.SmartMovingPlayerHandler;
+
+import net.minecraft.block.Block;
+import net.minecraft.util.math.MathHelper;
+
+public class SmartMovingClientPlayerHandler extends SmartMovingPlayerHandler {
 
     private final SmartMovingClientPlayer player;
 
     public SmartMovingClientPlayerHandler(SmartMovingClientPlayer player) {
+        super(player);
         this.player = player;
+    }
+
+    @Override
+    public SmartMovingRenderState getAndUpdateRenderState() {
+        super.getAndUpdateRenderState();
+        renderState.jump = player.isJumping();
+        renderState.flying = shouldDoFlyingAnimation();
+        renderState.falling = shouldDoFallingAnimation();
+        return this.renderState;
+    }
+
+    private boolean shouldDoFlyingAnimation() {
+        // if(Config.isFlyingEnabled() || Config.isLevitationAnimationEnabled())
+        return player.getCapabilities().isFlying;
+    }
+
+    private boolean shouldDoFallingAnimation() {
+        // if(Config.isFallAnimationEnabled())
+        return !player.isOnGround() && player.getFallDistance() > 2.5;// Config._fallAnimationDistanceMinimum.value;
+    }
+
+    @Override
+    public double getOverGroundHeight(double maximum) {
+        return (getBoundingBox().minY - getMaxPlayerSolidBetween(getBoundingBox().minY - maximum, getBoundingBox().minY, 0));
+    }
+
+    @Override
+    public Block getOverGroundBlockId(double distance) {
+        int x = MathHelper.floor(player.getPosX());
+        int y = MathHelper.floor(getBoundingBox().minY);
+        int z = MathHelper.floor(player.getPosZ());
+        int minY = y - (int) Math.ceil(distance);
+
+        for (; y >= minY; y--) {
+            Block block = getBlock(x, y, z);
+            if (block != null)
+                return block;
+        }
+        return null;
     }
 }

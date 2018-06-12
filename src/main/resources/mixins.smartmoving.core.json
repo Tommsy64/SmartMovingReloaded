@@ -5,12 +5,14 @@
     "compatibilityLevel": "JAVA_8",
     "minVersion": "0.7.5",
     "mixins": [
+        "MixinEntity",
+        "MixinEntityLivingBase",
         "MixinEntityPlayer",
-        "client.MixinAbstractClientPlayer",
-        "client.MixinEntityPlayerSP",
         "server.MixinEntityPlayerMP"
     ],
     "client": [
+        "client.MixinAbstractClientPlayer",
+        "client.MixinEntityPlayerSP",
         "client.MixinRenderPlayer",
         "client.MixinModelPlayer"
     ],

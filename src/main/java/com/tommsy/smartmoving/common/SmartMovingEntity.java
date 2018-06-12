@@ -16,19 +16,23 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.mixin;
+package com.tommsy.smartmoving.common;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import java.util.List;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.PlayerCapabilities;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.World;
 
-@Mixin(EntityPlayer.class)
-public abstract class MixinEntityPlayer extends MixinEntityLivingBase {
-    @Shadow
-    protected void jump() {}
+public interface SmartMovingEntity {
+    public AxisAlignedBB getEntityBoundingBox();
 
-    @Shadow
-    public PlayerCapabilities capabilities;
+    public double getPosX();
+
+    public double getPosY();
+
+    public double getPosZ();
+
+    public World getWorld();
+
+    public List<AxisAlignedBB> getIntersectingCollisionBoxes(AxisAlignedBB aabb);
 }

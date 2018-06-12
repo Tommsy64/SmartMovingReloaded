@@ -18,11 +18,40 @@
 
 package com.tommsy.smartmoving.server;
 
-public class SmartMovingServerPlayerHandler {
+import com.tommsy.smartmoving.common.SmartMovingPlayerHandler;
+
+import net.minecraft.block.Block;
+import net.minecraft.util.math.MathHelper;
+
+public class SmartMovingServerPlayerHandler extends SmartMovingPlayerHandler {
 
     private final SmartMovingServerPlayer player;
 
     public SmartMovingServerPlayerHandler(SmartMovingServerPlayer player) {
+        super(player);
         this.player = player;
+    }
+
+    @Override
+    public double getOverGroundHeight(double maximum) {
+        return (getBoundingBox().minY + 1D - getMaxPlayerSolidBetween(getBoundingBox().minY - maximum + 1D, getBoundingBox().minY + 1D, 0.1));
+    }
+
+    @Override
+    public Block getOverGroundBlockId(double distance) {
+        int x = MathHelper.floor(player.getPosX());
+        int y = MathHelper.floor(getBoundingBox().minY);
+        int z = MathHelper.floor(player.getPosZ());
+        int minY = y - (int) Math.ceil(distance);
+
+        y++;
+        minY++;
+
+        for (; y >= minY; y--) {
+            Block block = getBlock(x, y, z);
+            if (block != null)
+                return block;
+        }
+        return null;
     }
 }
