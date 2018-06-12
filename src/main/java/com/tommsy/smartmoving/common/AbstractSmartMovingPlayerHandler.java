@@ -20,19 +20,30 @@ package com.tommsy.smartmoving.common;
 
 import java.util.List;
 
+import com.tommsy.smartmoving.common.statistics.SmartStatistics;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleSplash;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 
-public abstract class SmartMovingPlayerHandler {
+public abstract class AbstractSmartMovingPlayerHandler {
 
     private final SmartMovingPlayer player;
+    public final SmartStatistics statistics;
 
-    protected SmartMovingPlayerHandler(SmartMovingPlayer player) {
+    protected AbstractSmartMovingPlayerHandler(SmartMovingPlayer player) {
         this.player = player;
+        this.statistics = new SmartStatistics(player);
     }
 
     protected boolean isSlow;
@@ -61,6 +72,9 @@ public abstract class SmartMovingPlayerHandler {
     protected int feetClimbType;
 
     protected int angleJumpType;
+
+    private float spawnSlindingParticle;
+    private float spawnSwimmingParticle;
 
     public final SmartMovingRenderState renderState = new SmartMovingRenderState();
 
@@ -125,6 +139,73 @@ public abstract class SmartMovingPlayerHandler {
         public int angleJumpType;
     }
 
+    public void spawnParticles(Minecraft minecraft) {
+        spawnParticles(minecraft, player.getPosX() - player.getPrevPosX(), player.getPosZ() - player.getPrevPosZ());
+    }
+
+    private void spawnParticles(Minecraft minecraft, double playerMotionX, double playerMotionZ) {
+        float horizontalSpeedSquare = 0;
+        if (isSliding || isSwimming)
+            horizontalSpeedSquare = (float) (playerMotionX * playerMotionX + playerMotionZ * playerMotionZ);
+
+        if (isSliding) {
+
+            AxisAlignedBB playerBoundingBox = player.getEntityBoundingBox();
+            int i = MathHelper.floor(player.getPosX());
+            int j = MathHelper.floor(playerBoundingBox.minY - 0.1F);
+            int k = MathHelper.floor(player.getPosZ());
+            Block block = getBlock(i, j, k);
+            if (block != null) {
+                double posY = playerBoundingBox.minY + 0.1D;
+                double motionX = -playerMotionX * 4D;
+                double motionY = 1.5D;
+                double motionZ = -playerMotionZ * 4D;
+
+                spawnSlindingParticle += horizontalSpeedSquare;
+
+                // float maxSpawnSlindingParticle = Config._slideParticlePeriodFactor.value * 0.1F;
+                float maxSpawnSlindingParticle = 0.5f * 0.1F; // Sliding particle spawning period factor (>= 0)
+                while (spawnSlindingParticle > maxSpawnSlindingParticle) {
+                    double posX = player.getPosX() + getSpawnOffset();
+                    double posZ = player.getPosZ() + getSpawnOffset();
+                    player.getWorld().spawnParticle(EnumParticleTypes.BLOCK_CRACK,
+                            posX, posY, posZ,
+                            motionX, motionY, motionZ,
+                            new int[] { Block.getStateId(getBlockState(i, j, k)) });
+                    spawnSlindingParticle -= maxSpawnSlindingParticle;
+                }
+            }
+        }
+
+        if (isSwimming) {
+            float posY = MathHelper.floor(player.getEntityBoundingBox().minY) + 1.0F;
+            int x = (int) Math.floor(player.getPosX());
+            int y = (int) Math.floor(posY - 0.5);
+            int z = (int) Math.floor(player.getPosZ());
+
+            boolean isLava = getBlockState(x, y, z).getMaterial() == Material.LAVA;
+            spawnSwimmingParticle += horizontalSpeedSquare;
+
+            // Config._lavaSwimParticlePeriodFactor.value = 4f
+            // Config._swimParticlePeriodFactor.value = 0f
+            // float maxSpawnSwimmingParticle = (isLava ? Config._lavaSwimParticlePeriodFactor.value : Config._swimParticlePeriodFactor.value) * 0.01F;
+            float maxSpawnSwimmingParticle = (isLava ? 4f : 0f) * 0.01F;
+            while (spawnSwimmingParticle > maxSpawnSwimmingParticle) {
+                double posX = player.getPosX() + getSpawnOffset();
+                double posZ = player.getPosZ() + getSpawnOffset();
+                Particle splash = isLava ? new ParticleSplash.Factory().createParticle(EnumParticleTypes.LAVA.getParticleID(), player.getWorld(), posX, posY, posZ, 0, 0.2, 0)
+                        : new ParticleSplash.Factory().createParticle(EnumParticleTypes.WATER_SPLASH.getParticleID(), player.getWorld(), posX, posY, posZ, 0, 0.2, 0);
+                minecraft.effectRenderer.addEffect(splash);
+
+                spawnSwimmingParticle -= maxSpawnSwimmingParticle;
+            }
+        }
+    }
+
+    private float getSpawnOffset() {
+        return (player.getRNG().nextFloat() - 0.5F) * 2F * player.getWidth();
+    }
+
     public abstract double getOverGroundHeight(double maximum);
 
     public abstract Block getOverGroundBlockId(double distance);
@@ -135,6 +216,10 @@ public abstract class SmartMovingPlayerHandler {
 
     protected Block getBlock(int x, int y, int z) {
         return player.getWorld().getBlockState(new BlockPos(x, y, z)).getBlock();
+    }
+
+    protected IBlockState getBlockState(int x, int y, int z) {
+        return player.getWorld().getBlockState(new BlockPos(x, y, z));
     }
 
     private List<AxisAlignedBB> getPlayerSolidBetween(double yMin, double yMax, double horizontalTolerance) {

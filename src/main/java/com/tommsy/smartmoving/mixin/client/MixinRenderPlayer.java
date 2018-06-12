@@ -24,8 +24,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.tommsy.smartmoving.common.SmartMovingPlayer;
-import com.tommsy.smartmoving.common.SmartMovingPlayerHandler;
-import com.tommsy.smartmoving.common.SmartMovingPlayerHandler.SmartMovingRenderState;
+import com.tommsy.smartmoving.common.AbstractSmartMovingPlayerHandler;
+import com.tommsy.smartmoving.common.AbstractSmartMovingPlayerHandler.SmartMovingRenderState;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -38,14 +38,13 @@ public class MixinRenderPlayer {
     @Inject(method = "doRender", at = @At("HEAD"))
     private void doRender(AbstractClientPlayer entityClientPlayer, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
         SmartMovingPlayer smPlayer = (SmartMovingPlayer) entityClientPlayer;
-        SmartMovingPlayerHandler handle = smPlayer.getPlayerHandler();
+        AbstractSmartMovingPlayerHandler handle = smPlayer.getPlayerHandler();
 
         boolean isInventory = x == 0 && y == 0 && z == 0 && entityYaw == 0 && partialTicks == 1.0;
 
         SmartMovingRenderState renderState = handle.getAndUpdateRenderState();
 
-        SmartStatistics statistics = SmartStatisticsFactory.getInstance(entityplayer);
-        float currentHorizontalSpeedFlattened = statistics != null ? statistics.getCurrentHorizontalSpeedFlattened(partialTicks, -1) : Float.NaN;
+        float currentHorizontalSpeedFlattened = handle.statistics != null ? handle.statistics.getCurrentHorizontalSpeedFlattened(partialTicks, -1) : Float.NaN;
         float smallOverGroundHeight = renderState.crawlClimb || renderState.headJump ? (float) handle.getOverGroundHeight(5D) : 0F;
         Block overGroundBlock = renderState.headJump && smallOverGroundHeight < 5F ? handle.getOverGroundBlockId(smallOverGroundHeight) : null;
 

@@ -19,32 +19,26 @@
 package com.tommsy.smartmoving.mixin.client;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.tommsy.smartmoving.common.SmartMovingPlayer;
-import com.tommsy.smartmoving.mixin.MixinEntityPlayer;
+import com.tommsy.smartmoving.client.SmartMovingOtherPlayer;
+import com.tommsy.smartmoving.client.SmartMovingOtherPlayerHandler;
 
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.entity.player.PlayerCapabilities;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
 
-@Mixin(AbstractClientPlayer.class)
-public abstract class MixinAbstractClientPlayer extends MixinEntityPlayer implements SmartMovingPlayer {
-    @Override
-    public boolean isJumping() {
-        return this.isJumping;
+@Mixin(EntityOtherPlayerMP.class)
+public abstract class MixinEntityOtherPlayerMP extends MixinAbstractClientPlayer implements SmartMovingOtherPlayer {
+    private SmartMovingOtherPlayerHandler playerHandler;
+
+    @Inject(method = "<init>*", at = @At("RETURN"))
+    private void onConstructed(CallbackInfo ci) {
+        playerHandler = new SmartMovingOtherPlayerHandler(this);
     }
 
     @Override
-    public PlayerCapabilities getCapabilities() {
-        return this.capabilities;
-    }
-
-    @Override
-    public boolean isOnGround() {
-        return this.onGround;
-    }
-
-    @Override
-    public float getFallDistance() {
-        return this.fallDistance;
+    public SmartMovingOtherPlayerHandler getPlayerHandler() {
+        return this.playerHandler;
     }
 }

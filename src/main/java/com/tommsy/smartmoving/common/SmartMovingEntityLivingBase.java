@@ -16,11 +16,22 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.server;
+package com.tommsy.smartmoving.common;
 
-import com.tommsy.smartmoving.common.SmartMovingPlayer;
+import java.util.Random;
 
-public interface SmartMovingServerPlayer extends SmartMovingPlayer {
-    @Override
-    public SmartMovingServerPlayerHandler getPlayerHandler();
+public interface SmartMovingEntityLivingBase extends SmartMovingEntity {
+    public float getPrevLimbSwingAmount();
+
+    public float getLimbSwingAmount();
+
+    public float getLimbSwing();
+
+    public void setPrevLimbSwingAmount(float prevLimbSwingAmount);
+
+    public void setLimbSwingAmount(float limbSwingAmount);
+
+    public void setLimbSwing(float limbSwing);
+
+    public Random getRNG();
 }

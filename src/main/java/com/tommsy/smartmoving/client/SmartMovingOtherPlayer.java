@@ -16,15 +16,11 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.mixin.server;
+package com.tommsy.smartmoving.client;
 
-import org.spongepowered.asm.mixin.Mixin;
+import com.tommsy.smartmoving.common.SmartMovingPlayer;
 
-import com.tommsy.smartmoving.mixin.MixinEntityPlayer;
-
-import net.minecraft.entity.player.EntityPlayerMP;
-
-@Mixin(EntityPlayerMP.class)
-public abstract class MixinEntityPlayerMP extends MixinEntityPlayer {
-
+public interface SmartMovingOtherPlayer extends SmartMovingPlayer {
+    @Override
+    public SmartMovingOtherPlayerHandler getPlayerHandler();
 }

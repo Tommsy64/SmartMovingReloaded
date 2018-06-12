@@ -12,6 +12,7 @@
     ],
     "client": [
         "client.MixinAbstractClientPlayer",
+        "client.MixinEntityOtherPlayerMP",
         "client.MixinEntityPlayerSP",
         "client.MixinRenderPlayer",
         "client.MixinModelPlayer"

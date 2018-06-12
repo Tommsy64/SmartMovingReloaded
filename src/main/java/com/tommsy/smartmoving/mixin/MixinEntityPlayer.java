@@ -31,4 +31,7 @@ public abstract class MixinEntityPlayer extends MixinEntityLivingBase {
 
     @Shadow
     public PlayerCapabilities capabilities;
+
+    @Shadow
+    public void travel(float strafe, float vertical, float forward) {};
 }

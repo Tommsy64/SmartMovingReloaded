@@ -40,8 +40,8 @@ public abstract class MixinEntity extends Entity implements SmartMovingEntity {
         super(worldIn);
     }
 
-    @Override
     @Shadow
+    @Override
     public abstract AxisAlignedBB getEntityBoundingBox();
 
     @Override
@@ -51,17 +51,57 @@ public abstract class MixinEntity extends Entity implements SmartMovingEntity {
 
     @Override
     public double getPosY() {
-        return this.posX;
+        return this.posY;
     }
 
     @Override
     public double getPosZ() {
-        return this.posX;
+        return this.posZ;
+    }
+
+    @Override
+    public double getPrevPosX() {
+        return this.prevPosX;
+    }
+
+    @Override
+    public double getPrevPosY() {
+        return this.prevPosY;
+    }
+
+    @Override
+    public double getPrevPosZ() {
+        return this.prevPosZ;
+    }
+
+    @Override
+    public double getDeltaX() {
+        return this.posX - this.prevPosX;
+    }
+
+    @Override
+    public double getDeltaY() {
+        return this.posY - this.prevPosY;
+    }
+
+    @Override
+    public double getDeltaZ() {
+        return this.posZ - this.prevPosZ;
     }
 
     @Override
     public World getWorld() {
         return this.world;
+    }
+
+    @Override
+    public float getWidth() {
+        return this.width;
+    }
+
+    @Override
+    public float getHeight() {
+        return this.height;
     }
 
     @Override

@@ -16,25 +16,44 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.server;
+package com.tommsy.smartmoving.client;
 
-import com.tommsy.smartmoving.common.SmartMovingPlayerHandler;
+import com.tommsy.smartmoving.common.AbstractSmartMovingPlayerHandler;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.math.MathHelper;
 
-public class SmartMovingServerPlayerHandler extends SmartMovingPlayerHandler {
+public class SmartMovingPlayerHandler extends AbstractSmartMovingPlayerHandler {
 
-    private final SmartMovingServerPlayer player;
+    private final SmartMovingClientPlayer player;
 
-    public SmartMovingServerPlayerHandler(SmartMovingServerPlayer player) {
+    public SmartMovingPlayerHandler(SmartMovingClientPlayer player) {
         super(player);
         this.player = player;
     }
 
     @Override
+    public SmartMovingRenderState getAndUpdateRenderState() {
+        super.getAndUpdateRenderState();
+        renderState.jump = player.isJumping();
+        renderState.flying = shouldDoFlyingAnimation();
+        renderState.falling = shouldDoFallingAnimation();
+        return this.renderState;
+    }
+
+    private boolean shouldDoFlyingAnimation() {
+        // if(Config.isFlyingEnabled() || Config.isLevitationAnimationEnabled())
+        return player.getCapabilities().isFlying;
+    }
+
+    private boolean shouldDoFallingAnimation() {
+        // if(Config.isFallAnimationEnabled())
+        return !player.isOnGround() && player.getFallDistance() > 2.5;// Config._fallAnimationDistanceMinimum.value;
+    }
+
+    @Override
     public double getOverGroundHeight(double maximum) {
-        return (getBoundingBox().minY + 1D - getMaxPlayerSolidBetween(getBoundingBox().minY - maximum + 1D, getBoundingBox().minY + 1D, 0.1));
+        return (getBoundingBox().minY - getMaxPlayerSolidBetween(getBoundingBox().minY - maximum, getBoundingBox().minY, 0));
     }
 
     @Override
@@ -43,9 +62,6 @@ public class SmartMovingServerPlayerHandler extends SmartMovingPlayerHandler {
         int y = MathHelper.floor(getBoundingBox().minY);
         int z = MathHelper.floor(player.getPosZ());
         int minY = y - (int) Math.ceil(distance);
-
-        y++;
-        minY++;
 
         for (; y >= minY; y--) {
             Block block = getBlock(x, y, z);

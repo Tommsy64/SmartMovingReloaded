@@ -18,6 +18,16 @@
 
 package com.tommsy.smartmoving.common;
 
-public interface SmartMovingPlayer extends SmartMovingEntity {
-    public SmartMovingPlayerHandler getPlayerHandler();
+import net.minecraft.entity.player.PlayerCapabilities;
+
+public interface SmartMovingPlayer extends SmartMovingEntityLivingBase {
+    public AbstractSmartMovingPlayerHandler getPlayerHandler();
+
+    public boolean isJumping();
+
+    public PlayerCapabilities getCapabilities();
+
+    public boolean isOnGround();
+
+    public float getFallDistance();
 }

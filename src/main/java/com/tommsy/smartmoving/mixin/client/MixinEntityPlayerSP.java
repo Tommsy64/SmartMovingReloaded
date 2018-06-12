@@ -26,23 +26,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.tommsy.smartmoving.SmartMovingMod;
 import com.tommsy.smartmoving.client.SmartMovingClientPlayer;
-import com.tommsy.smartmoving.client.SmartMovingClientPlayerHandler;
+import com.tommsy.smartmoving.client.SmartMovingPlayerHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.player.PlayerCapabilities;
 
 @Mixin(EntityPlayerSP.class)
 public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer implements SmartMovingClientPlayer {
-    private SmartMovingClientPlayerHandler playerHandler;
+    private SmartMovingPlayerHandler playerHandler;
 
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void onConstructed(CallbackInfo ci) {
-        playerHandler = new SmartMovingClientPlayerHandler(this);
+        playerHandler = new SmartMovingPlayerHandler(this);
     }
 
     @Override
-    public SmartMovingClientPlayerHandler getPlayerHandler() {
+    public SmartMovingPlayerHandler getPlayerHandler() {
         return this.playerHandler;
     }
 
@@ -56,23 +55,34 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
         super.jump();
     }
 
+    @Override
+    public void travel(float strafe, float vertical, float forward) {
+        super.travel(strafe, vertical, forward);
+        // statistics.calculateAllStats(false);
+    }
+
+    @Inject(method = "onUpdate", at = @At("RETURN"))
+    private void afterUpdateRidden(CallbackInfo ci) {
+        // statistics.calculateRiddenStats();
+    }
+
     @Inject(method = "onUpdate", at = @At("HEAD"))
-    private void beforeOnUpdate() {
+    private void beforeOnUpdate(CallbackInfo ci) {
 
     }
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
-    private void afterOnUpdate() {
+    private void afterOnUpdate(CallbackInfo ci) {
 
     }
 
     @Inject(method = "onLivingUpdate", at = @At("HEAD"))
-    private void beforeOnLivingUpdate() {
+    private void beforeOnLivingUpdate(CallbackInfo ci) {
 
     }
 
     @Inject(method = "onLivingUpdate", at = @At("RETURN"))
-    private void afterOnLivingUpdate() {
+    private void afterOnLivingUpdate(CallbackInfo ci) {
 
     }
 
@@ -81,25 +91,5 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
         if (SmartMovingMod.clientProxy.keyBindGrab.isKeyDown()) {
             ci.cancel();
         }
-    }
-
-    @Override
-    public boolean isJumping() {
-        return this.isJumping;
-    }
-
-    @Override
-    public PlayerCapabilities getCapabilities() {
-        return this.capabilities;
-    }
-
-    @Override
-    public boolean isOnGround() {
-        return this.onGround;
-    }
-
-    @Override
-    public float getFallDistance() {
-        return this.fallDistance;
     }
 }

@@ -32,7 +32,23 @@ public interface SmartMovingEntity {
 
     public double getPosZ();
 
+    public double getPrevPosX();
+
+    public double getPrevPosY();
+
+    public double getPrevPosZ();
+
+    public double getDeltaX();
+
+    public double getDeltaY();
+
+    public double getDeltaZ();
+
     public World getWorld();
+
+    public float getWidth();
+
+    public float getHeight();
 
     public List<AxisAlignedBB> getIntersectingCollisionBoxes(AxisAlignedBB aabb);
 }

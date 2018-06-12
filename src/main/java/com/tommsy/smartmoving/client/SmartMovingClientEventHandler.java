@@ -18,8 +18,12 @@
 
 package com.tommsy.smartmoving.client;
 
+import java.util.Iterator;
+
 import com.tommsy.smartmoving.SmartMovingInfo;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.config.Config.Type;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
@@ -37,7 +41,19 @@ public class SmartMovingClientEventHandler {
 
     @SubscribeEvent
     public void tickStart(ClientTickEvent event) {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        if (minecraft.world == null || minecraft.world.isRemote)
+            return;
 
+        Iterator<EntityPlayer> others = minecraft.world.playerEntities.iterator();
+        while (others.hasNext()) {
+            EntityPlayer player = others.next();
+            if (player instanceof SmartMovingOtherPlayer) {
+                SmartMovingOtherPlayerHandler handle = ((SmartMovingOtherPlayer) player).getPlayerHandler();
+                handle.statistics.calculateAllStats(true);
+                handle.spawnParticles(minecraft);
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL, receiveCanceled = true)
