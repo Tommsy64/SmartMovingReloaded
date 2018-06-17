@@ -28,19 +28,19 @@ import net.minecraft.client.model.ModelRenderer;
 @Mixin(ModelBiped.class)
 public abstract class MixinModelBiped extends ModelBase {
     @Shadow
-    public ModelRenderer shadow$bipedHead;
+    public ModelRenderer bipedHead;
     @Shadow
-    public ModelRenderer shadow$bipedHeadwear;
+    public ModelRenderer bipedHeadwear;
     @Shadow
-    public ModelRenderer shadow$bipedBody;
+    public ModelRenderer bipedBody;
     @Shadow
-    public ModelRenderer shadow$bipedRightArm;
+    public ModelRenderer bipedRightArm;
     @Shadow
-    public ModelRenderer shadow$bipedLeftArm;
+    public ModelRenderer bipedLeftArm;
     @Shadow
-    public ModelRenderer shadow$bipedRightLeg;
+    public ModelRenderer bipedRightLeg;
     @Shadow
-    public ModelRenderer shadow$bipedLeftLeg;
+    public ModelRenderer bipedLeftLeg;
 
     @Shadow
     public boolean isSneak;

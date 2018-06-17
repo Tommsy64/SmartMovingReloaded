@@ -66,6 +66,8 @@ public abstract class MixinEntityPlayerMP extends MixinEntityPlayer implements S
         return this.mcServer;
     }
 
+    public boolean crawlingInitialized;
+
     @Inject(method = "onUpdate", at = @At("HEAD"))
     public void preOnUpdate(CallbackInfo ci) {
         if (playerHandler.crawlingCooldown > 0)
@@ -93,12 +95,12 @@ public abstract class MixinEntityPlayerMP extends MixinEntityPlayer implements S
         double offset = SmallSizeItemGrabHeight;
         AxisAlignedBB box = this.getEntityBoundingBox().expand(1, offset, 1);
 
-        List<Entity> offsetEntities = this.world.getEntitiesWithinAABBExcludingEntity(this, box);
+        List<Entity> offsetEntities = this.world.getEntitiesWithinAABBExcludingEntity((Entity) ((Object) this), box);
         if (offsetEntities != null && offsetEntities.size() > 0) {
             Entity[] offsetEntityArray = offsetEntities.toArray(new Entity[offsetEntities.size()]);
 
             box = box.expand(0, -offset, 0);
-            List<Entity> standardEntities = this.world.getEntitiesWithinAABBExcludingEntity(this, box);
+            List<Entity> standardEntities = this.world.getEntitiesWithinAABBExcludingEntity((Entity) ((Object) this), box);
 
             for (int i = 0; i < offsetEntityArray.length; i++) {
                 Entity offsetEntity = offsetEntityArray[i];
@@ -121,7 +123,7 @@ public abstract class MixinEntityPlayerMP extends MixinEntityPlayer implements S
     @Override
     public void setPosition(double x, double y, double z) {
         super.setPosition(x, y, z);
-        if (!playerHandler.crawlingInitialized)
+        if (!crawlingInitialized)
             setMaxY(getMinY() + getHeight() - 1);
     }
 
@@ -141,9 +143,9 @@ public abstract class MixinEntityPlayerMP extends MixinEntityPlayer implements S
 
     @Override
     public boolean isPlayerSleeping() {
-        if (!playerHandler.crawlingInitialized) {
+        if (!crawlingInitialized) {
             setMaxY(getMinY() + getHeight());
-            playerHandler.crawlingInitialized = true;
+            crawlingInitialized = true;
         }
         return super.isPlayerSleeping();
     }

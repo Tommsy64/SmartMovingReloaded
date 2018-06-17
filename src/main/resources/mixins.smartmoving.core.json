@@ -15,7 +15,8 @@
         "client.MixinEntityOtherPlayerMP",
         "client.MixinEntityPlayerSP",
         "client.MixinRenderPlayer",
-        "client.MixinModelPlayer"
+        "client.MixinModelPlayer",
+        "client.MixinModelBiped"
     ],
     "injectors": {
         "defaultRequire": 1

@@ -44,6 +44,9 @@ public abstract class MixinEntityPlayer extends MixinEntityLivingBase {
     }
 
     @Shadow
+    protected boolean sleeping;
+
+    @Shadow
     public boolean isPlayerSleeping() {
         return false;
     }

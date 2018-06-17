@@ -87,7 +87,7 @@ public abstract class MixinEntityLivingBase extends MixinEntity implements Smart
 
     @Shadow
     public abstract PotionEffect getActivePotionEffect(Potion potionIn);
-    
+
     @Shadow
     public abstract ItemStack getActiveItemStack();
 }

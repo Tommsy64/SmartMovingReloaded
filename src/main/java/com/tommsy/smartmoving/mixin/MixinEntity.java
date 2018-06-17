@@ -30,19 +30,59 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 
 @Mixin(Entity.class)
-public abstract class MixinEntity extends Entity implements SmartMovingEntity {
+public abstract class MixinEntity implements SmartMovingEntity {
 
-    public MixinEntity() {
-        super(null);
-    }
+    @Shadow
+    public World world;
+    @Shadow
+    public double prevPosX;
+    @Shadow
+    public double prevPosY;
+    @Shadow
+    public double prevPosZ;
+    @Shadow
+    public double posX;
+    @Shadow
+    public double posY;
+    @Shadow
+    public double posZ;
+    @Shadow
+    public double motionX;
+    @Shadow
+    public double motionY;
+    @Shadow
+    public double motionZ;
+    @Shadow
+    public float rotationYaw;
+    @Shadow
+    public boolean onGround;
 
-    public MixinEntity(World worldIn) {
-        super(worldIn);
-    }
+    @Shadow
+    public boolean isDead;
+    @Shadow
+    public float width;
+    @Shadow
+    public float height;
+
+    @Shadow
+    public int dimension;
+    @Shadow
+    public float fallDistance;
 
     @Shadow
     @Override
     public abstract AxisAlignedBB getEntityBoundingBox();
+
+    @Shadow
+    public boolean isSneaking() {
+        return false;
+    }
+
+    @Shadow
+    public abstract void setEntityBoundingBox(AxisAlignedBB bb);
+
+    @Shadow
+    public void setPosition(double x, double y, double z) {}
 
     @Override
     public double getPosX() {
@@ -116,6 +156,6 @@ public abstract class MixinEntity extends Entity implements SmartMovingEntity {
 
     @Override
     public List<AxisAlignedBB> getIntersectingCollisionBoxes(AxisAlignedBB aabb) {
-        return this.world.getCollisionBoxes(this, aabb);
+        return this.world.getCollisionBoxes((Entity) ((Object) this), aabb);
     }
 }

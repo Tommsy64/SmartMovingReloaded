@@ -144,7 +144,7 @@ public abstract class AbstractSmartMovingClientPlayerHandler {
     }
 
     @ToString
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.PUBLIC)
     public static class SmartMovingRenderState {
         public boolean climb;
         public boolean climbJump;

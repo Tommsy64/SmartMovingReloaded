@@ -46,9 +46,8 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
     }
 
     @Shadow
-    protected boolean sleeping;
-    @Shadow
     protected Minecraft mc;
+
     @Override
     public Minecraft getMinecraft() {
         return mc;
