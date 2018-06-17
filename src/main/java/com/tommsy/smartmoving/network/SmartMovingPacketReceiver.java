@@ -18,6 +18,22 @@
 
 package com.tommsy.smartmoving.network;
 
-public interface SmartMovingPacketReceiver {
+import com.tommsy.smartmoving.server.SmartMovingServerPlayer;
 
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+
+public interface SmartMovingPacketReceiver {
+    boolean processStatePacket(FMLProxyPacket packet, SmartMovingServerPlayer player, int entityId, long state);
+
+    boolean processConfigInfoPacket(FMLProxyPacket packet, SmartMovingServerPlayer player, String info);
+
+    boolean processConfigContentPacket(FMLProxyPacket packet, SmartMovingServerPlayer player, String[] content, String username);
+
+    boolean processConfigChangePacket(FMLProxyPacket packet, SmartMovingServerPlayer player);
+
+    boolean processSpeedChangePacket(FMLProxyPacket packet, SmartMovingServerPlayer player, int difference, String username);
+
+    boolean processHungerChangePacket(FMLProxyPacket packet, SmartMovingServerPlayer player, float hunger);
+
+    boolean processSoundPacket(FMLProxyPacket packet, SmartMovingServerPlayer player, String soundId, float distance, float pitch);
 }

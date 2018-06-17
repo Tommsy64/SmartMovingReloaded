@@ -105,6 +105,16 @@ public abstract class MixinEntity extends Entity implements SmartMovingEntity {
     }
 
     @Override
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
+    @Override
+    public int getDimension() {
+        return this.dimension;
+    }
+
+    @Override
     public List<AxisAlignedBB> getIntersectingCollisionBoxes(AxisAlignedBB aabb) {
         return this.world.getCollisionBoxes(this, aabb);
     }

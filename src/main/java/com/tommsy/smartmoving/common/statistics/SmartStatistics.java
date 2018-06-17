@@ -18,8 +18,9 @@
 
 package com.tommsy.smartmoving.common.statistics;
 
-import com.tommsy.smartmoving.common.SmartMovingPlayer;
+import com.tommsy.smartmoving.client.SmartMovingAbstractClientPlayer;
 
+import lombok.Setter;
 import net.minecraft.util.math.MathHelper;
 
 /**
@@ -27,13 +28,10 @@ import net.minecraft.util.math.MathHelper;
  */
 public class SmartStatistics {
 
+    @Setter
     protected static boolean calculateHorizontalStats = false;
 
-    public static void setCalculateHorizontalStats(boolean flag) {
-        calculateHorizontalStats = flag;
-    }
-
-    private final SmartMovingPlayer player;
+    private final SmartMovingAbstractClientPlayer player;
 
     private float tickDistance;
 
@@ -44,7 +42,7 @@ public class SmartStatistics {
     private final SmartStatisticsDatas[] datas = new SmartStatisticsDatas[10];
     private int currentDataIndex = -1;
 
-    public SmartStatistics(SmartMovingPlayer player) {
+    public SmartStatistics(SmartMovingAbstractClientPlayer player) {
         this.player = player;
     }
 

@@ -18,6 +18,10 @@
 
 package com.tommsy.smartmoving;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SmartMovingInfo {
     public static final String MODID = "@MODID@";
     public static final String NAME = "@NAME@";
@@ -27,6 +31,4 @@ public final class SmartMovingInfo {
     public static final String NETWORK_ID = "SmrtMvng|" + COMMUNICATION_VERSION;
 
     public static final String CONFIG_FILE_NAME = "SmartMoving";
-
-    private SmartMovingInfo() {}
 }

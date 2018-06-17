@@ -18,6 +18,7 @@ buildscript {
 
 plugins {
     id "com.diffplug.gradle.spotless" version "3.13.0"
+    id 'io.franzbecker.gradle-lombok' version '1.14'
     id "com.github.johnrengelman.shadow" version "2.0.4"
 }
 
@@ -67,6 +68,7 @@ repositories {
         name = 'sponge'
         url = 'http://repo.spongepowered.org/maven'
     }
+    jcenter() // required for Lombok dependency
 }
 
 dependencies {
@@ -77,6 +79,11 @@ dependencies {
         exclude module: 'guava'
         exclude module: 'log4j-core'
     }
+}
+
+lombok {
+    version = "1.18.0"
+    sha256 = "88ed9af526d13a84361cbe1216f815ee78c82c342618ea1a48b6de1acbb9d2b4"
 }
 
 sourceSets {
@@ -102,7 +109,8 @@ jar {
                 'TweakOrder': 0,
                 'MixinConfigs': [
                         'mixins.smartmoving.core.json'
-                ].join(',')
+                ].join(','),
+                'FMLAT': 'smartmoving_at.cfg'
         )
     }
 }

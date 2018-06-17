@@ -16,18 +16,24 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.common;
+package com.tommsy.smartmoving.client.render;
 
-import net.minecraft.entity.player.PlayerCapabilities;
+public class Name {
+    public final String obfuscated;
+    public final String forgefuscated;
+    public final String deobfuscated;
 
-public interface SmartMovingPlayer extends SmartMovingEntityLivingBase {
-    public AbstractSmartMovingPlayerHandler getPlayerHandler();
+    public Name(String name) {
+        this(name, null);
+    }
 
-    public boolean isJumping();
+    public Name(String deobfuscatedName, String obfuscatedName) {
+        this(deobfuscatedName, null, obfuscatedName);
+    }
 
-    public PlayerCapabilities getCapabilities();
-
-    public boolean isOnGround();
-
-    public float getFallDistance();
+    public Name(String deobfuscatedName, String forgefuscatedName, String obfuscatedName) {
+        deobfuscated = deobfuscatedName;
+        forgefuscated = forgefuscatedName;
+        obfuscated = obfuscatedName;
+    }
 }

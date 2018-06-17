@@ -26,29 +26,33 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.tommsy.smartmoving.SmartMovingMod;
 import com.tommsy.smartmoving.client.SmartMovingClientPlayer;
-import com.tommsy.smartmoving.client.SmartMovingPlayerHandler;
+import com.tommsy.smartmoving.client.SmartMovingClientPlayerHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 
 @Mixin(EntityPlayerSP.class)
 public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer implements SmartMovingClientPlayer {
-    private SmartMovingPlayerHandler playerHandler;
+    private SmartMovingClientPlayerHandler smPlayer;
 
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void onConstructed(CallbackInfo ci) {
-        playerHandler = new SmartMovingPlayerHandler(this);
+        smPlayer = new SmartMovingClientPlayerHandler(this);
     }
 
     @Override
-    public SmartMovingPlayerHandler getPlayerHandler() {
-        return this.playerHandler;
+    public SmartMovingClientPlayerHandler getPlayerHandler() {
+        return this.smPlayer;
     }
 
     @Shadow
     protected boolean sleeping;
     @Shadow
     protected Minecraft mc;
+    @Override
+    public Minecraft getMinecraft() {
+        return mc;
+    }
 
     @Override
     protected void jump() {

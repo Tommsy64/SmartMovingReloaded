@@ -16,13 +16,19 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.common;
+package com.tommsy.smartmoving.client;
+
+import static com.tommsy.smartmoving.client.render.RenderUtils.Half;
+import static com.tommsy.smartmoving.client.render.RenderUtils.Quarter;
+import static com.tommsy.smartmoving.client.render.RenderUtils.RadiantToAngle;
 
 import java.util.List;
 
+import com.tommsy.smartmoving.client.render.RenderDataTracker;
 import com.tommsy.smartmoving.common.statistics.SmartStatistics;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.minecraft.block.Block;
@@ -36,45 +42,72 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
-public abstract class AbstractSmartMovingPlayerHandler {
+public abstract class AbstractSmartMovingClientPlayerHandler {
 
-    private final SmartMovingPlayer player;
+    private final SmartMovingAbstractClientPlayer player;
     public final SmartStatistics statistics;
 
-    protected AbstractSmartMovingPlayerHandler(SmartMovingPlayer player) {
+    protected AbstractSmartMovingClientPlayerHandler(SmartMovingAbstractClientPlayer player) {
         this.player = player;
         this.statistics = new SmartStatistics(player);
     }
 
+    @Getter
     protected boolean isSlow;
+    @Getter
+    protected boolean isFast;
 
-    protected boolean isClimbing;
-    protected boolean isHandsVineClimbing;
-    protected boolean isFeetVineClimbing;
+    @Getter
+    public boolean isClimbing;
+    @Getter
+    public boolean isHandsVineClimbing;
+    @Getter
+    public boolean isFeetVineClimbing;
 
+    @Getter
     protected boolean isClimbJumping;
+    @Getter
     protected boolean isClimbBackJumping;
+    @Getter
     protected boolean isWallJumping;
+    @Getter
     protected boolean isClimbCrawling;
+    @Getter
     protected boolean isCrawlClimbing;
+    @Getter
     protected boolean isCeilingClimbing;
 
-    protected boolean isDipping;
-    protected boolean isSwimming;
-    protected boolean isDiving;
-    protected boolean isLevitating;
-    protected boolean isHeadJumping;
-    protected boolean isCrawling;
+    @Getter
+    public boolean isDipping;
+    @Getter
+    public boolean isSwimming;
+    @Getter
+    public boolean isDiving;
+    @Getter
+    public boolean isLevitating;
+    public boolean isHeadJumping;
+    @Getter
+    public boolean isCrawling;
+    @Getter
     protected boolean isSliding;
+    @Getter
     protected boolean isFlying;
 
-    protected int handsClimbType;
-    protected int feetClimbType;
+    public int handsClimbType;
+    public int feetClimbType;
 
-    protected int angleJumpType;
+    public int angleJumpType;
 
     private float spawnSlindingParticle;
     private float spawnSwimmingParticle;
+
+    public float heightOffset;
+
+    public float exhaustion;
+    public float jumpCharge, headJumpCharge;
+
+    public float maxExhaustionForAction;
+    public float maxExhaustionToStartAction;
 
     public final SmartMovingRenderState renderState = new SmartMovingRenderState();
 
@@ -106,7 +139,7 @@ public abstract class AbstractSmartMovingPlayerHandler {
         return renderState;
     }
 
-    private boolean isAngleJumping() {
+    public boolean isAngleJumping() {
         return angleJumpType > 1 && angleJumpType < 7;
     }
 
@@ -228,7 +261,7 @@ public abstract class AbstractSmartMovingPlayerHandler {
         return player.getIntersectingCollisionBoxes(horizontalTolerance == 0 ? bb : bb.expand(horizontalTolerance, 0, horizontalTolerance));
     }
 
-    protected double getMaxPlayerSolidBetween(double yMin, double yMax, double horizontalTolerance) {
+    public double getMaxPlayerSolidBetween(double yMin, double yMax, double horizontalTolerance) {
         List<AxisAlignedBB> solids = getPlayerSolidBetween(yMin, yMax, horizontalTolerance);
         double result = yMin;
         for (int i = 0; i < solids.size(); i++) {
@@ -239,7 +272,7 @@ public abstract class AbstractSmartMovingPlayerHandler {
         return Math.min(result, yMax);
     }
 
-    protected double getMinPlayerSolidBetween(double yMin, double yMax, double horizontalTolerance) {
+    public double getMinPlayerSolidBetween(double yMin, double yMax, double horizontalTolerance) {
         List<AxisAlignedBB> solids = getPlayerSolidBetween(yMin, yMax, horizontalTolerance);
         double result = yMax;
         for (int i = 0; i < solids.size(); i++) {
@@ -257,5 +290,17 @@ public abstract class AbstractSmartMovingPlayerHandler {
                 box.minY <= yMax &&
                 box.maxZ >= getBoundingBox().minZ - horizontalTolerance &&
                 box.minZ <= getBoundingBox().maxZ + horizontalTolerance;
+    }
+
+    protected void onStartClimbBackJump() {
+        RenderDataTracker.getPreviousRendererData(player).rotateAngleY += isHeadJumping ? Half : Quarter;
+        isClimbBackJumping = true;
+    }
+
+    protected void onStartWallJump(Float angle) {
+        if (angle != null)
+            RenderDataTracker.getPreviousRendererData(player).rotateAngleY = angle / RadiantToAngle;
+        isWallJumping = true;
+        player.setFallDistance(0);
     }
 }

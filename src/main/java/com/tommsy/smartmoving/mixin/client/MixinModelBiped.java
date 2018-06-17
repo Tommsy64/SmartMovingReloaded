@@ -16,41 +16,37 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.mixin;
+package com.tommsy.smartmoving.mixin.client;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.PlayerCapabilities;
+import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.model.ModelRenderer;
 
-@Mixin(EntityPlayer.class)
-public abstract class MixinEntityPlayer extends MixinEntityLivingBase {
+@Mixin(ModelBiped.class)
+public abstract class MixinModelBiped extends ModelBase {
     @Shadow
-    protected void jump() {}
-
+    public ModelRenderer shadow$bipedHead;
     @Shadow
-    public PlayerCapabilities capabilities;
-
+    public ModelRenderer shadow$bipedHeadwear;
     @Shadow
-    public void travel(float strafe, float vertical, float forward) {}
-
+    public ModelRenderer shadow$bipedBody;
     @Shadow
-    public void onLivingUpdate() {}
-
+    public ModelRenderer shadow$bipedRightArm;
     @Shadow
-    public boolean isEntityInsideOpaqueBlock() {
-        return false;
-    }
-
+    public ModelRenderer shadow$bipedLeftArm;
     @Shadow
-    public boolean isPlayerSleeping() {
-        return false;
-    }
+    public ModelRenderer shadow$bipedRightLeg;
+    @Shadow
+    public ModelRenderer shadow$bipedLeftLeg;
 
     @Shadow
-    public abstract float getAIMoveSpeed();
+    public boolean isSneak;
 
     @Shadow
-    public abstract void addMovementStat(double diffX, double diffY, double diffZ);
+    public ModelBiped.ArmPose leftArmPose;
+    @Shadow
+    public ModelBiped.ArmPose rightArmPose;
 }

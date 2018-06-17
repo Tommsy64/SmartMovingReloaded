@@ -16,13 +16,28 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.client;
+package com.tommsy.smartmoving.client.render;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.*;
 
-public interface SmartMovingClientPlayer extends SmartMovingAbstractClientPlayer {
-    @Override
-    public SmartMovingClientPlayerHandler getPlayerHandler();
+public class ClimbGap {
+    public Block Block;
+    public int Meta;
+    public boolean CanStand;
+    public boolean MustCrawl;
+    public Orientation Direction;
+    public boolean SkipGaps;
 
-    public Minecraft getMinecraft();
+    public ClimbGap() {
+        reset();
+    }
+
+    public void reset() {
+        Block = null;
+        Meta = -1;
+        CanStand = false;
+        MustCrawl = false;
+        Direction = null;
+        SkipGaps = false;
+    }
 }

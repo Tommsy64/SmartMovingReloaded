@@ -26,6 +26,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import com.tommsy.smartmoving.common.SmartMovingEntityLivingBase;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 
 @Mixin(EntityLivingBase.class)
 public abstract class MixinEntityLivingBase extends MixinEntity implements SmartMovingEntityLivingBase {
@@ -38,6 +41,9 @@ public abstract class MixinEntityLivingBase extends MixinEntity implements Smart
     public float limbSwingAmount;
     @Shadow
     public float limbSwing;
+
+    @Shadow
+    public float jumpMovementFactor;
 
     @Override
     public float getPrevLimbSwingAmount() {
@@ -72,4 +78,16 @@ public abstract class MixinEntityLivingBase extends MixinEntity implements Smart
     @Shadow
     @Override
     public abstract Random getRNG();
+
+    @Shadow
+    public abstract float getHealth();
+
+    @Shadow
+    public abstract int getItemInUseCount();
+
+    @Shadow
+    public abstract PotionEffect getActivePotionEffect(Potion potionIn);
+    
+    @Shadow
+    public abstract ItemStack getActiveItemStack();
 }

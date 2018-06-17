@@ -18,12 +18,10 @@
 
 package com.tommsy.smartmoving.client;
 
-import com.tommsy.smartmoving.common.AbstractSmartMovingPlayerHandler;
-
 import net.minecraft.block.Block;
 import net.minecraft.util.math.MathHelper;
 
-public class SmartMovingOtherPlayerHandler extends AbstractSmartMovingPlayerHandler {
+public class SmartMovingOtherPlayerHandler extends AbstractSmartMovingClientPlayerHandler {
 
     private final SmartMovingOtherPlayer player;
 
@@ -53,5 +51,98 @@ public class SmartMovingOtherPlayerHandler extends AbstractSmartMovingPlayerHand
                 return block;
         }
         return null;
+    }
+
+    private boolean isJumping, doingFlyingAnimation, doingFallingAnimation;
+
+    public void processStatePacket(long state) {
+        feetClimbType = (int) (state & 15);
+        state >>>= 4;
+
+        handsClimbType = (int) (state & 15);
+        state >>>= 4;
+
+        isJumping = (state & 1) != 0;
+        state >>>= 1;
+
+        isDiving = (state & 1) != 0;
+        state >>>= 1;
+
+        isDipping = (state & 1) != 0;
+        state >>>= 1;
+
+        isSwimming = (state & 1) != 0;
+        state >>>= 1;
+
+        isCrawlClimbing = (state & 1) != 0;
+        state >>>= 1;
+
+        isCrawling = (state & 1) != 0;
+        state >>>= 1;
+
+        isClimbing = (state & 1) != 0;
+        state >>>= 1;
+
+        boolean isSmall = (state & 1) != 0;
+        heightOffset = isSmall ? -1 : 0;
+        player.setHeight(1.8F + heightOffset);
+        state >>>= 1;
+
+        doingFallingAnimation = (state & 1) != 0;
+        state >>>= 1;
+
+        doingFlyingAnimation = (state & 1) != 0;
+        state >>>= 1;
+
+        isCeilingClimbing = (state & 1) != 0;
+        state >>>= 1;
+
+        isLevitating = (state & 1) != 0;
+        state >>>= 1;
+
+        isHeadJumping = (state & 1) != 0;
+        state >>>= 1;
+
+        isSliding = (state & 1) != 0;
+        state >>>= 1;
+
+        angleJumpType = (int) (state & 7);
+        state >>>= 3;
+
+        isFeetVineClimbing = (state & 1) != 0;
+        state >>>= 1;
+
+        isHandsVineClimbing = (state & 1) != 0;
+        state >>>= 1;
+
+        isClimbJumping = (state & 1) != 0;
+        state >>>= 1;
+
+        boolean wasClimbBackJumping = isClimbBackJumping;
+        isClimbBackJumping = (state & 1) != 0;
+        if (!wasClimbBackJumping && isClimbBackJumping)
+            onStartClimbBackJump();
+        state >>>= 1;
+
+        isSlow = (state & 1) != 0;
+        state >>>= 1;
+
+        isFast = (state & 1) != 0;
+        state >>>= 1;
+
+        boolean wasWallJumping = isWallJumping;
+        isWallJumping = (state & 1) != 0;
+        if (!wasWallJumping && isWallJumping)
+            onStartWallJump(null);
+        state >>>= 1;
+    }
+
+    @Override
+    public SmartMovingRenderState getAndUpdateRenderState() {
+        super.getAndUpdateRenderState();
+        renderState.jump = isJumping;
+        renderState.flying = doingFlyingAnimation;
+        renderState.falling = doingFallingAnimation;
+        return this.renderState;
     }
 }

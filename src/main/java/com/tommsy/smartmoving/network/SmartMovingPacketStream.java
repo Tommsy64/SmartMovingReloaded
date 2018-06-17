@@ -25,12 +25,13 @@ import java.io.ObjectInputStream;
 import java.util.HashSet;
 import java.util.Set;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SmartMovingPacketStream {
-
-    private SmartMovingPacketStream() {}
 
     private static final Set<StackTraceElement> EXCEPTIONS = new HashSet<StackTraceElement>();
 

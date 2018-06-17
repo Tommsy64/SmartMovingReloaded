@@ -18,16 +18,14 @@
 
 package com.tommsy.smartmoving.client;
 
-import com.tommsy.smartmoving.common.AbstractSmartMovingPlayerHandler;
-
 import net.minecraft.block.Block;
 import net.minecraft.util.math.MathHelper;
 
-public class SmartMovingPlayerHandler extends AbstractSmartMovingPlayerHandler {
+public class SmartMovingClientPlayerHandler extends AbstractSmartMovingClientPlayerHandler {
 
     private final SmartMovingClientPlayer player;
 
-    public SmartMovingPlayerHandler(SmartMovingClientPlayer player) {
+    public SmartMovingClientPlayerHandler(SmartMovingClientPlayer player) {
         super(player);
         this.player = player;
     }

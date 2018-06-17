@@ -20,14 +20,14 @@ package com.tommsy.smartmoving.mixin.client;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import com.tommsy.smartmoving.common.SmartMovingPlayer;
+import com.tommsy.smartmoving.client.SmartMovingAbstractClientPlayer;
 import com.tommsy.smartmoving.mixin.MixinEntityPlayer;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.entity.player.PlayerCapabilities;
 
 @Mixin(AbstractClientPlayer.class)
-public abstract class MixinAbstractClientPlayer extends MixinEntityPlayer implements SmartMovingPlayer {
+public abstract class MixinAbstractClientPlayer extends MixinEntityPlayer implements SmartMovingAbstractClientPlayer {
     @Override
     public boolean isJumping() {
         return this.isJumping;
@@ -46,5 +46,10 @@ public abstract class MixinAbstractClientPlayer extends MixinEntityPlayer implem
     @Override
     public float getFallDistance() {
         return this.fallDistance;
+    }
+
+    @Override
+    public void setFallDistance(float fallDistance) {
+        this.fallDistance = fallDistance;
     }
 }

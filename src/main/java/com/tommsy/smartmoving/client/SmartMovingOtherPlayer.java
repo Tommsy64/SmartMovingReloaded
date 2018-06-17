@@ -18,9 +18,7 @@
 
 package com.tommsy.smartmoving.client;
 
-import com.tommsy.smartmoving.common.SmartMovingPlayer;
-
-public interface SmartMovingOtherPlayer extends SmartMovingPlayer {
+public interface SmartMovingOtherPlayer extends SmartMovingAbstractClientPlayer {
     @Override
     public SmartMovingOtherPlayerHandler getPlayerHandler();
 }

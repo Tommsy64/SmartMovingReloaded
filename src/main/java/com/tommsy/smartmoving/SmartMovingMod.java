@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
 import com.tommsy.smartmoving.client.SmartMovingClientEventHandler;
+import com.tommsy.smartmoving.common.statistics.SmartStatistics;
 import com.tommsy.smartmoving.network.SmartMovingNetworkHandler;
 
 import net.minecraft.client.settings.KeyBinding;
@@ -77,6 +78,15 @@ public class SmartMovingMod {
             ClientRegistry.registerKeyBinding(keyBindGrab);
 
             MinecraftForge.EVENT_BUS.register(new SmartMovingClientEventHandler());
+
+            SmartStatistics.setCalculateHorizontalStats(true);
+
+            // ClientRegistry.registerKeyBinding(Options.keyBindGrab);
+            // ClientRegistry.registerKeyBinding(Options.keyBindConfigToggle);
+            // ClientRegistry.registerKeyBinding(Options.keyBindSpeedIncrease);
+            // ClientRegistry.registerKeyBinding(Options.keyBindSpeedDecrease);
+
+            SmartMovingMod.logger.info("Using communication protocal version {}", SmartMovingInfo.COMMUNICATION_VERSION);
         }
     }
 

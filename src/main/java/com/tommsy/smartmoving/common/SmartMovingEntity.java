@@ -50,5 +50,9 @@ public interface SmartMovingEntity {
 
     public float getHeight();
 
+    public void setHeight(float height);
+
+    public int getDimension();
+
     public List<AxisAlignedBB> getIntersectingCollisionBoxes(AxisAlignedBB aabb);
 }

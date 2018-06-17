@@ -18,6 +18,10 @@
 
 package com.tommsy.smartmoving.network;
 
+import com.tommsy.smartmoving.client.SmartMovingClient;
+import com.tommsy.smartmoving.server.SmartMovingServer;
+
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
@@ -25,11 +29,11 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketE
 public class SmartMovingNetworkHandler {
     @SubscribeEvent
     public void onServerPacket(ServerCustomPacketEvent event) {
-
+        SmartMovingPacketStream.receivePacket(event.getPacket(), SmartMovingServer.INSTANCE, ((NetHandlerPlayServer) event.getHandler()).player);
     }
 
     @SubscribeEvent
     public void onClientPacket(ClientCustomPacketEvent event) {
-
+        SmartMovingPacketStream.receivePacket(event.getPacket(), SmartMovingClient.INSTANCE, null);
     }
 }

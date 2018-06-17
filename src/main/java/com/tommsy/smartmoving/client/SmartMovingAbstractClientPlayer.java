@@ -18,11 +18,20 @@
 
 package com.tommsy.smartmoving.client;
 
-import net.minecraft.client.Minecraft;
+import com.tommsy.smartmoving.common.SmartMovingEntityLivingBase;
 
-public interface SmartMovingClientPlayer extends SmartMovingAbstractClientPlayer {
-    @Override
-    public SmartMovingClientPlayerHandler getPlayerHandler();
+import net.minecraft.entity.player.PlayerCapabilities;
 
-    public Minecraft getMinecraft();
+public interface SmartMovingAbstractClientPlayer extends SmartMovingEntityLivingBase {
+    public AbstractSmartMovingClientPlayerHandler getPlayerHandler();
+
+    public boolean isJumping();
+
+    public PlayerCapabilities getCapabilities();
+
+    public boolean isOnGround();
+
+    public float getFallDistance();
+
+    public void setFallDistance(float fallDistance);
 }

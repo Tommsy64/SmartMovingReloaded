@@ -16,13 +16,17 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.client;
+package com.tommsy.smartmoving.client.render;
 
-import net.minecraft.client.Minecraft;
-
-public interface SmartMovingClientPlayer extends SmartMovingAbstractClientPlayer {
-    @Override
-    public SmartMovingClientPlayerHandler getPlayerHandler();
-
-    public Minecraft getMinecraft();
+public class RendererData {
+    public float offsetX;
+    public float offsetY;
+    public float offsetZ;
+    public float rotateAngleX;
+    public float rotateAngleY;
+    public float rotateAngleZ;
+    public float rotationPointX;
+    public float rotationPointY;
+    public float rotationPointZ;
+    public float totalTime = Float.MIN_VALUE;
 }
