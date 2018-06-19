@@ -71,6 +71,12 @@ repositories {
     jcenter() // required for Lombok dependency
 }
 
+sourceSets {
+    main {
+        ext.refMap = "mixins.smartmoving.refmap.json"
+    }
+}
+
 dependencies {
     compile('org.spongepowered:mixin:0.7.10-SNAPSHOT') {
         exclude module: 'asm-commons'
@@ -79,17 +85,12 @@ dependencies {
         exclude module: 'guava'
         exclude module: 'log4j-core'
     }
+    runtime 'org.jetbrains.java.decompiler:fernflower:sponge-SNAPSHOT'
 }
 
 lombok {
     version = "1.18.0"
     sha256 = "88ed9af526d13a84361cbe1216f815ee78c82c342618ea1a48b6de1acbb9d2b4"
-}
-
-sourceSets {
-    main {
-        ext.refMap = "mixins.smartmoving.refmap.json"
-    }
 }
 
 jar {

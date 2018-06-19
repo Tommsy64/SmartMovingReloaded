@@ -22,8 +22,6 @@ import static com.tommsy.smartmoving.client.render.RenderUtils.Half;
 import static com.tommsy.smartmoving.client.render.RenderUtils.RadiantToAngle;
 import static com.tommsy.smartmoving.client.render.RenderUtils.Whole;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
@@ -43,9 +41,7 @@ public class ModelRotationRenderer extends ModelRenderer {
         if (base != null)
             base.addChild(this);
 
-        scaleX = 1.0F;
-        scaleY = 1.0F;
-        scaleZ = 1.0F;
+        scaleX = scaleY = scaleZ = 1.0F;
 
         fadeEnabled = false;
     }
@@ -72,22 +68,11 @@ public class ModelRotationRenderer extends ModelRenderer {
         postTransforms(f, true, useParentTransformations);
     }
 
-    public boolean preRender(float f) {
-        if (isHidden)
+    private boolean preRender(float f) {
+        if (isHidden || !showModel)
             return false;
-
-        if (!showModel)
-            return false;
-
         if (!compiled)
-            UpdateCompiled();
-
-        if (!compiled) {
-            Reflect.Invoke(_compileDisplayList, this, f);
-            UpdateDisplayList();
-            compiled = true;
-        }
-
+            this.compileDisplayList(f);
         return true;
     }
 
@@ -203,63 +188,30 @@ public class ModelRotationRenderer extends ModelRenderer {
     }
 
     @Override
-    public void renderWithRotation(float f) {
-        boolean update = !compiled;
-        super.renderWithRotation(f);
-        if (update)
-            UpdateLocals();
-    }
-
-    @Override
     public void postRender(float f) {
-        boolean update = !compiled;
         if (!preRender(f))
             return;
-        if (update)
-            UpdateLocals();
         preTransforms(f, false, true);
     }
-
-    private void UpdateLocals() {
-        UpdateCompiled();
-        if (compiled)
-            UpdateDisplayList();
-    }
-
-    private void UpdateCompiled() {
-        compiled = (Boolean) Reflect.GetField(_compiled, this);
-    }
-
-    private void UpdateDisplayList() {
-        displayList = (Integer) Reflect.GetField(_displayList, this);
-    }
-
-    private static Field _compiled = Reflect.GetField(ModelRenderer.class, SmartRenderInstall.ModelRenderer_compiled);
-    private static Method _compileDisplayList = Reflect.GetMethod(ModelRenderer.class, SmartRenderInstall.ModelRenderer_compileDisplayList, float.class);
-    private static Field _displayList = Reflect.GetField(ModelRenderer.class, SmartRenderInstall.ModelRenderer_displayList);
 
     protected ModelRotationRenderer base;
 
     public boolean ignoreRender;
     public boolean forceRender;
 
-    public boolean compiled;
-    public int displayList;
     public int rotationOrder;
 
-    public float scaleX;
-    public float scaleY;
-    public float scaleZ;
+    public float scaleX, scaleY, scaleZ;
 
     public boolean ignoreBase;
     public boolean ignoreSuperRotation;
 
-    public static int XYZ = 0;
-    public static int XZY = 1;
-    public static int YXZ = 2;
-    public static int YZX = 3;
-    public static int ZXY = 4;
-    public static int ZYX = 5;
+    public static final int XYZ = 0;
+    public static final int XZY = 1;
+    public static final int YXZ = 2;
+    public static final int YZX = 3;
+    public static final int ZXY = 4;
+    public static final int ZYX = 5;
 
     public boolean fadeEnabled;
 
@@ -292,17 +244,17 @@ public class ModelRotationRenderer extends ModelRenderer {
 
     public void fadeIntermediate(float totalTime) {
         if (previous != null && totalTime - previous.totalTime <= 2F) {
-            offsetX = GetIntermediatePosition(previous.offsetX, offsetX, fadeOffsetX, previous.totalTime, totalTime);
-            offsetY = GetIntermediatePosition(previous.offsetY, offsetY, fadeOffsetY, previous.totalTime, totalTime);
-            offsetZ = GetIntermediatePosition(previous.offsetZ, offsetZ, fadeOffsetZ, previous.totalTime, totalTime);
+            offsetX = getIntermediatePosition(previous.offsetX, offsetX, fadeOffsetX, previous.totalTime, totalTime);
+            offsetY = getIntermediatePosition(previous.offsetY, offsetY, fadeOffsetY, previous.totalTime, totalTime);
+            offsetZ = getIntermediatePosition(previous.offsetZ, offsetZ, fadeOffsetZ, previous.totalTime, totalTime);
 
-            rotateAngleX = GetIntermediateAngle(previous.rotateAngleX, rotateAngleX, fadeRotateAngleX, previous.totalTime, totalTime);
-            rotateAngleY = GetIntermediateAngle(previous.rotateAngleY, rotateAngleY, fadeRotateAngleY, previous.totalTime, totalTime);
-            rotateAngleZ = GetIntermediateAngle(previous.rotateAngleZ, rotateAngleZ, fadeRotateAngleZ, previous.totalTime, totalTime);
+            rotateAngleX = getIntermediateAngle(previous.rotateAngleX, rotateAngleX, fadeRotateAngleX, previous.totalTime, totalTime);
+            rotateAngleY = getIntermediateAngle(previous.rotateAngleY, rotateAngleY, fadeRotateAngleY, previous.totalTime, totalTime);
+            rotateAngleZ = getIntermediateAngle(previous.rotateAngleZ, rotateAngleZ, fadeRotateAngleZ, previous.totalTime, totalTime);
 
-            rotationPointX = GetIntermediatePosition(previous.rotationPointX, rotationPointX, fadeRotationPointX, previous.totalTime, totalTime);
-            rotationPointY = GetIntermediatePosition(previous.rotationPointY, rotationPointY, fadeRotationPointY, previous.totalTime, totalTime);
-            rotationPointZ = GetIntermediatePosition(previous.rotationPointZ, rotationPointZ, fadeRotationPointZ, previous.totalTime, totalTime);
+            rotationPointX = getIntermediatePosition(previous.rotationPointX, rotationPointX, fadeRotationPointX, previous.totalTime, totalTime);
+            rotationPointY = getIntermediatePosition(previous.rotationPointY, rotationPointY, fadeRotationPointY, previous.totalTime, totalTime);
+            rotationPointZ = getIntermediatePosition(previous.rotationPointZ, rotationPointZ, fadeRotationPointZ, previous.totalTime, totalTime);
         }
     }
 
@@ -310,14 +262,14 @@ public class ModelRotationRenderer extends ModelRenderer {
         return true;
     }
 
-    private static float GetIntermediatePosition(float prevPosition, float shouldPosition, boolean fade, float lastTotalTime, float totalTime) {
+    private static float getIntermediatePosition(float prevPosition, float shouldPosition, boolean fade, float lastTotalTime, float totalTime) {
         if (!fade || shouldPosition == prevPosition)
             return shouldPosition;
 
         return prevPosition + (shouldPosition - prevPosition) * (totalTime - lastTotalTime) * 0.2F;
     }
 
-    private static float GetIntermediateAngle(float prevAngle, float shouldAngle, boolean fade, float lastTotalTime, float totalTime) {
+    private static float getIntermediateAngle(float prevAngle, float shouldAngle, boolean fade, float lastTotalTime, float totalTime) {
         if (!fade || shouldAngle == prevAngle)
             return shouldAngle;
 

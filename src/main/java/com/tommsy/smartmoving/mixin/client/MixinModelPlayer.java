@@ -1237,22 +1237,6 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
         }
     }
 
-    // private static float Between(float min, float max, float value) {
-    // if (value < min)
-    // return min;
-    // if (value > max)
-    // return max;
-    // return value;
-    // }
-    //
-    // private static float Normalize(float radiant) {
-    // while (radiant > Half)
-    // radiant -= Whole;
-    // while (radiant < -Half)
-    // radiant += Whole;
-    // return radiant;
-    // }
-
     private static final int Scale = 0;
     private static final int NoScaleStart = 1;
     private static final int NoScaleEnd = 2;

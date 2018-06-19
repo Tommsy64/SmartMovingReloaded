@@ -28,6 +28,7 @@ import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.tommsy.smartmoving.client.AbstractSmartMovingClientPlayerHandler;
@@ -36,6 +37,7 @@ import com.tommsy.smartmoving.client.SmartMovingAbstractClientPlayer;
 import com.tommsy.smartmoving.client.SmartMovingClientPlayer;
 import com.tommsy.smartmoving.client.SmartMovingOtherPlayer;
 import com.tommsy.smartmoving.client.SmartMovingOtherPlayerHandler;
+import com.tommsy.smartmoving.client.model.LayerPlayerArmor;
 import com.tommsy.smartmoving.client.model.SmartMovingModelPlayer;
 import com.tommsy.smartmoving.client.render.ISmartMovingRenderPlayer;
 import com.tommsy.smartmoving.client.render.RenderDataTracker;
@@ -50,6 +52,7 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
 import net.minecraft.entity.player.EntityPlayer;
 
 @Mixin(RenderPlayer.class)
@@ -58,6 +61,11 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
 
     private MixinRenderPlayer(RenderManager renderManagerIn, ModelBase modelBaseIn, float shadowSizeIn) {
         super(renderManagerIn, modelBaseIn, shadowSizeIn);
+    }
+
+    @Redirect(method = "<init>(Lnet/minecraft/client/renderer/entity/RenderManager;Z)V", at = @At(value = "NEW", target = "Lnet/minecraft/client/renderer/entity/layers/LayerBipedArmor;"))
+    private LayerBipedArmor constructLayerPlayerArmor(RenderLivingBase<?> $this) {
+        return new LayerPlayerArmor($this);
     }
 
     @Intrinsic
