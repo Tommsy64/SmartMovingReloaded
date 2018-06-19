@@ -22,6 +22,8 @@ import static com.tommsy.smartmoving.client.render.RenderUtils.Half;
 import static com.tommsy.smartmoving.client.render.RenderUtils.Quarter;
 import static com.tommsy.smartmoving.client.render.RenderUtils.RadiantToAngle;
 
+import java.util.ListIterator;
+
 import org.spongepowered.asm.mixin.Implements;
 import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Intrinsic;
@@ -34,10 +36,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.tommsy.smartmoving.client.AbstractSmartMovingClientPlayerHandler;
 import com.tommsy.smartmoving.client.AbstractSmartMovingClientPlayerHandler.SmartMovingRenderState;
 import com.tommsy.smartmoving.client.SmartMovingAbstractClientPlayer;
+import com.tommsy.smartmoving.client.SmartMovingClient;
 import com.tommsy.smartmoving.client.SmartMovingClientPlayer;
 import com.tommsy.smartmoving.client.SmartMovingOtherPlayer;
 import com.tommsy.smartmoving.client.SmartMovingOtherPlayerHandler;
 import com.tommsy.smartmoving.client.model.LayerPlayerArmor;
+import com.tommsy.smartmoving.client.model.SmartMovingModelBiped;
 import com.tommsy.smartmoving.client.model.SmartMovingModelPlayer;
 import com.tommsy.smartmoving.client.render.ISmartMovingRenderPlayer;
 import com.tommsy.smartmoving.client.render.RenderDataTracker;
@@ -86,11 +90,15 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
         float smallOverGroundHeight = renderState.crawlClimb || renderState.headJump ? (float) handle.getOverGroundHeight(5D) : 0F;
         Block overGroundBlock = renderState.headJump && smallOverGroundHeight < 5F ? handle.getOverGroundBlockId(smallOverGroundHeight) : null;
 
-        SmartMovingModelPlayer modelPlayer = this.sm$getMainModel();
-        modelPlayer.setRenderState(renderState);
-        modelPlayer.setCurrentHorizontalSpeedFlattened(currentHorizontalSpeedFlattened);
-        modelPlayer.setSmallOverGroundHeight(smallOverGroundHeight);
-        modelPlayer.setOverGroundBlock(overGroundBlock);
+        ListIterator<SmartMovingModelBiped> iterator = SmartMovingClient.modelBipedInstances.listIterator();
+        while (iterator.hasNext()) {
+            // SmartMovingModelPlayer modelPlayer = this.sm$getMainModel();
+            SmartMovingModelBiped modelPlayer = iterator.next();
+            modelPlayer.setRenderState(renderState);
+            modelPlayer.setCurrentHorizontalSpeedFlattened(currentHorizontalSpeedFlattened);
+            modelPlayer.setSmallOverGroundHeight(smallOverGroundHeight);
+            modelPlayer.setOverGroundBlock(overGroundBlock);
+        }
 
         if (!isInventory && entityClientPlayer.isSneaking() && !(entityClientPlayer instanceof EntityPlayerSP) && renderState.crawl)
             y += 0.125D;
@@ -137,21 +145,26 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
                 statistics.prevHorizontalAngle = currentHorizontalAngle;
             }
 
-            modelPlayer.setInventory(isInventory);
-            modelPlayer.setSleeping(isSleeping);
+            iterator = SmartMovingClient.modelBipedInstances.listIterator();
+            while (iterator.hasNext()) {
+                // SmartMovingModelPlayer modelPlayer = this.sm$getMainModel();
+                SmartMovingModelBiped modelPlayer = iterator.next();
+                modelPlayer.setInventory(isInventory);
+                modelPlayer.setSleeping(isSleeping);
 
-            modelPlayer.setTotalVerticalDistance(totalVerticalDistance);
-            modelPlayer.setCurrentVerticalSpeed(currentVerticalSpeed);
-            modelPlayer.setTotalDistance(totalDistance);
-            modelPlayer.setCurrentSpeed(currentSpeed);
+                modelPlayer.setTotalVerticalDistance(totalVerticalDistance);
+                modelPlayer.setCurrentVerticalSpeed(currentVerticalSpeed);
+                modelPlayer.setTotalDistance(totalDistance);
+                modelPlayer.setCurrentSpeed(currentSpeed);
 
-            modelPlayer.setDistance(distance);
-            modelPlayer.setVerticalDistance(verticalDistance);
-            modelPlayer.setHorizontalDistance(horizontalDistance);
-            modelPlayer.setCurrentCameraAngle(currentCameraAngle);
-            modelPlayer.setCurrentVerticalAngle(currentVerticalAngle);
-            modelPlayer.setCurrentHorizontalAngle(currentHorizontalAngle);
-            modelPlayer.setPrevOuterRenderData(RenderDataTracker.getPreviousRendererData(entityClientPlayer));
+                modelPlayer.setDistance(distance);
+                modelPlayer.setVerticalDistance(verticalDistance);
+                modelPlayer.setHorizontalDistance(horizontalDistance);
+                modelPlayer.setCurrentCameraAngle(currentCameraAngle);
+                modelPlayer.setCurrentVerticalAngle(currentVerticalAngle);
+                modelPlayer.setCurrentHorizontalAngle(currentHorizontalAngle);
+                modelPlayer.setPrevOuterRenderData(RenderDataTracker.getPreviousRendererData(entityClientPlayer));
+            }
         }
 
         // CurrentMainModel = modelBipedMain;

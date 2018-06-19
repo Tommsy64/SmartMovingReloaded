@@ -92,7 +92,8 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
     @Inject(method = "updateEntityActionState", at = @At("HEAD"), cancellable = true)
     private void updateEntityActionState(CallbackInfo ci) {
         if (SmartMovingMod.clientProxy.keyBindGrab.isKeyDown()) {
-            ci.cancel();
-        }
+            smPlayer.isCrawling = true;
+        } else
+            smPlayer.isCrawling = false;
     }
 }

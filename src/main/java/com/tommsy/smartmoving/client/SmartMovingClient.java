@@ -19,6 +19,7 @@
 package com.tommsy.smartmoving.client;
 
 import com.tommsy.smartmoving.SmartMovingInfo;
+import com.tommsy.smartmoving.client.model.SmartMovingModelBiped;
 import com.tommsy.smartmoving.common.util.WeakLinkedList;
 import com.tommsy.smartmoving.network.SmartMovingPacketReceiver;
 import com.tommsy.smartmoving.network.SmartMovingPacketSender;
@@ -29,7 +30,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
-import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
@@ -41,7 +41,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SmartMovingClient implements SmartMovingPacketReceiver, SmartMovingPacketSender {
-    public static WeakLinkedList<ModelPlayer> modelPlayerInstances;
+    public static final WeakLinkedList<SmartMovingModelBiped> modelBipedInstances = new WeakLinkedList<>();
 
     public static final SmartMovingClient INSTANCE = new SmartMovingClient();
 

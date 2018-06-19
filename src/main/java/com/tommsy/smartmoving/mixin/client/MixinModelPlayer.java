@@ -40,6 +40,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.tommsy.smartmoving.SmartMovingMod;
 import com.tommsy.smartmoving.client.AbstractSmartMovingClientPlayerHandler.SmartMovingRenderState;
+import com.tommsy.smartmoving.client.SmartMovingClient;
 import com.tommsy.smartmoving.client.model.SmartMovingModelPlayer;
 import com.tommsy.smartmoving.client.render.FeetClimbing;
 import com.tommsy.smartmoving.client.render.HandsClimbing;
@@ -162,7 +163,6 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
 
     public boolean isStandard;
 
-    // TODO: Initialize
     @Setter
     private SmartMovingRenderState renderState;
     @Setter
@@ -236,58 +236,7 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
             this.bipedLeftLegwear = smBipedLeftLegwear;
         }
 
-        // if (SmartRenderRender.CurrentMainModel != null) {
-        // isInventory = SmartRenderRender.CurrentMainModel.isInventory;
-        //
-        // totalVerticalDistance = SmartRenderRender.CurrentMainModel.totalVerticalDistance;
-        // currentVerticalSpeed = SmartRenderRender.CurrentMainModel.currentVerticalSpeed;
-        // totalDistance = SmartRenderRender.CurrentMainModel.totalDistance;
-        // currentSpeed = SmartRenderRender.CurrentMainModel.currentSpeed;
-        //
-        // distance = SmartRenderRender.CurrentMainModel.distance;
-        // verticalDistance = SmartRenderRender.CurrentMainModel.verticalDistance;
-        // horizontalDistance = SmartRenderRender.CurrentMainModel.horizontalDistance;
-        // currentCameraAngle = SmartRenderRender.CurrentMainModel.currentCameraAngle;
-        // currentVerticalAngle = SmartRenderRender.CurrentMainModel.currentVerticalAngle;
-        // currentHorizontalAngle = SmartRenderRender.CurrentMainModel.currentHorizontalAngle;
-        // prevOuterRenderData = SmartRenderRender.CurrentMainModel.prevOuterRenderData;
-        // isSleeping = SmartRenderRender.CurrentMainModel.isSleeping;
-        //
-        // actualRotation = SmartRenderRender.CurrentMainModel.actualRotation;
-        // forwardRotation = SmartRenderRender.CurrentMainModel.forwardRotation;
-        // workingAngle = SmartRenderRender.CurrentMainModel.workingAngle;
-        // }
-        //
-        // if(SmartMovingRender.CurrentMainModel != null)
-        // {
-        // isClimb = SmartMovingRender.CurrentMainModel.isClimb;
-        // isClimbJump = SmartMovingRender.CurrentMainModel.isClimbJump;
-        // handsClimbType = SmartMovingRender.CurrentMainModel.handsClimbType;
-        // feetClimbType = SmartMovingRender.CurrentMainModel.feetClimbType;
-        // isHandsVineClimbing = SmartMovingRender.CurrentMainModel.isHandsVineClimbing;
-        // isFeetVineClimbing = SmartMovingRender.CurrentMainModel.isFeetVineClimbing;
-        // isCeilingClimb = SmartMovingRender.CurrentMainModel.isCeilingClimb;
-        // isSwim = SmartMovingRender.CurrentMainModel.isSwim;
-        // isDive = SmartMovingRender.CurrentMainModel.isDive;
-        // isCrawl = SmartMovingRender.CurrentMainModel.isCrawl;
-        // isCrawlClimb = SmartMovingRender.CurrentMainModel.isCrawlClimb;
-        // isJump = SmartMovingRender.CurrentMainModel.isJump;
-        // isHeadJump = SmartMovingRender.CurrentMainModel.isHeadJump;
-        // isSlide = SmartMovingRender.CurrentMainModel.isSlide;
-        // isFlying = SmartMovingRender.CurrentMainModel.isFlying;
-        // isLevitate = SmartMovingRender.CurrentMainModel.isLevitate;
-        // isFalling = SmartMovingRender.CurrentMainModel.isFalling;
-        // isGenericSneaking = SmartMovingRender.CurrentMainModel.isGenericSneaking;
-        // isAngleJumping = SmartMovingRender.CurrentMainModel.isAngleJumping;
-        // angleJumpType = SmartMovingRender.CurrentMainModel.angleJumpType;
-        // isRopeSliding = SmartMovingRender.CurrentMainModel.isRopeSliding;
-        //
-        // currentHorizontalSpeedFlattened = SmartMovingRender.CurrentMainModel.currentHorizontalSpeedFlattened;
-        // smallOverGroundHeight = SmartMovingRender.CurrentMainModel.smallOverGroundHeight;
-        // overGroundBlock = SmartMovingRender.CurrentMainModel.overGroundBlock;
-        // }
-
-        // SmartMovingClient.modelPlayerInstances.add((ModelPlayer) ((Object) this));
+        SmartMovingClient.modelBipedInstances.add(this);
     }
 
     private ModelRotationRenderer create(ModelRotationRenderer base) {
@@ -676,8 +625,8 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
             bipedLeftArm.rotateAngleZ = Thirtytwoth;
         } else if (renderState.ceilingClimb) {
             float distance = totalHorizontalDistance * 0.7F;
-            float walkFactor = Factor(currentHorizontalSpeed, 0F, 0.12951545F);
-            float standFactor = Factor(currentHorizontalSpeed, 0.12951545F, 0F);
+            float walkFactor = factor(currentHorizontalSpeed, 0F, 0.12951545F);
+            float standFactor = factor(currentHorizontalSpeed, 0.12951545F, 0F);
             float horizontalAngle = horizontalDistance < 0.015F ? currentCameraAngle : currentHorizontalAngle;
 
             bipedLeftArm.rotateAngleX = (MathHelper.cos(distance) * 0.52F + Half) * walkFactor + Half * standFactor;
@@ -695,9 +644,9 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
             bipedHead.rotateAngleY = -rotateY;
         } else if (renderState.swim) {
             float distance = totalHorizontalDistance;
-            float walkFactor = Factor(currentHorizontalSpeed, 0.15679921F, 0.52264464F);
-            float sneakFactor = Math.min(Factor(currentHorizontalSpeed, 0, 0.15679921F), Factor(currentHorizontalSpeed, 0.52264464F, 0.15679921F));
-            float standFactor = Factor(currentHorizontalSpeed, 0.15679921F, 0F);
+            float walkFactor = factor(currentHorizontalSpeed, 0.15679921F, 0.52264464F);
+            float sneakFactor = Math.min(factor(currentHorizontalSpeed, 0, 0.15679921F), factor(currentHorizontalSpeed, 0.52264464F, 0.15679921F));
+            float standFactor = factor(currentHorizontalSpeed, 0.15679921F, 0F);
             float standSneakFactor = standFactor + sneakFactor;
             float horizontalAngle = horizontalDistance < (renderState.genericSneak ? 0.005 : 0.015F) ? currentCameraAngle : currentHorizontalAngle;
 
@@ -739,8 +688,8 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
                         1F + (MathHelper.cos(totalTime * 0.1F - Quarter) - 1F) * 0.15F * sneakFactor);
         } else if (renderState.dive) {
             float distance = totalDistance * 0.7F;
-            float walkFactor = Factor(currentSpeed, 0F, 0.15679921F);
-            float standFactor = Factor(currentSpeed, 0.15679921F, 0F);
+            float walkFactor = factor(currentSpeed, 0F, 0.15679921F);
+            float standFactor = factor(currentSpeed, 0.15679921F, 0F);
             float horizontalAngle = totalDistance < (renderState.genericSneak ? 0.005 : 0.015F) ? currentCameraAngle : currentHorizontalAngle;
 
             bipedHead.rotateAngleX = -Eighth;
@@ -767,8 +716,8 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
                         1F + (MathHelper.cos(distance + Quarter) - 1F) * 0.15F * walkFactor);
         } else if (renderState.crawl) {
             float distance = totalHorizontalDistance * 1.3F;
-            float walkFactor = Factor(currentHorizontalSpeedFlattened, 0F, 0.12951545F);
-            float standFactor = Factor(currentHorizontalSpeedFlattened, 0.12951545F, 0F);
+            float walkFactor = factor(currentHorizontalSpeedFlattened, 0F, 0.12951545F);
+            float standFactor = factor(currentHorizontalSpeedFlattened, 0.12951545F, 0F);
 
             bipedHead.rotateAngleZ = -viewHorizontalAngelOffset / RadiantToAngle;
             bipedHead.rotateAngleX = -Eighth;
@@ -809,7 +758,7 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
                         1F + (MathHelper.cos(distance - Quarter) - 1F) * 0.15F * walkFactor);
         } else if (renderState.slide) {
             float distance = totalHorizontalDistance * 0.7F;
-            float walkFactor = Factor(currentHorizontalSpeed, 0F, 1F) * 0.8F;
+            float walkFactor = factor(currentHorizontalSpeed, 0F, 1F) * 0.8F;
 
             bipedHead.rotateAngleZ = -viewHorizontalAngelOffset / RadiantToAngle;
             bipedHead.rotateAngleX = -Eighth - Sixteenth;
@@ -845,8 +794,8 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
             bipedLeftArm.rotateAngleY = Quarter;
         } else if (renderState.flying) {
             float distance = totalDistance * 0.08F;
-            float walkFactor = Factor(currentSpeed, 0F, 1);
-            float standFactor = Factor(currentSpeed, 1F, 0F);
+            float walkFactor = factor(currentSpeed, 0F, 1);
+            float standFactor = factor(currentSpeed, 1F, 0F);
             float time = totalTime * 0.15F;
             float verticalAngle = renderState.jump ? Math.abs(currentVerticalAngle) : currentVerticalAngle;
             float horizontalAngle = horizontalDistance < 0.05F ? currentCameraAngle : currentHorizontalAngle;
@@ -878,21 +827,21 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
 
             bipedHead.rotateAngleX = -bipedOuter.rotateAngleX / 2F;
 
-            float bendFactor = Math.min(Factor(currentVerticalAngle, Quarter, 0), Factor(currentVerticalAngle, -Quarter, 0));
+            float bendFactor = Math.min(factor(currentVerticalAngle, Quarter, 0), factor(currentVerticalAngle, -Quarter, 0));
             bipedRightArm.rotateAngleX = bendFactor * -Eighth;
             bipedLeftArm.rotateAngleX = bendFactor * -Eighth;
 
             bipedRightLeg.rotateAngleX = bendFactor * -Eighth;
             bipedLeftLeg.rotateAngleX = bendFactor * -Eighth;
 
-            float armFactorZ = Factor(currentVerticalAngle, Quarter, -Quarter);
+            float armFactorZ = factor(currentVerticalAngle, Quarter, -Quarter);
             if (overGroundBlock != null && overGroundBlock.getBlockState().getBaseState().getMaterial().isSolid())
                 armFactorZ = Math.min(armFactorZ, smallOverGroundHeight / 5F);
 
             bipedRightArm.rotateAngleZ = Half - Sixteenth + armFactorZ * Eighth;
             bipedLeftArm.rotateAngleZ = Sixteenth - Half - armFactorZ * Eighth;
 
-            float legFactorZ = Factor(currentVerticalAngle, -Quarter, Quarter);
+            float legFactorZ = factor(currentVerticalAngle, -Quarter, Quarter);
             bipedRightLeg.rotateAngleZ = Sixtyfourth * legFactorZ;
             bipedLeftLeg.rotateAngleZ = -Sixtyfourth * legFactorZ;
         } else if (renderState.falling) {
@@ -1169,7 +1118,8 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
             smBipedCape.setRotationPoint(0.0F, 0.0F, 2.0F);
     }
 
-    private ModelRenderer getRandomBox(Random par1Random) {
+    @Override
+    public ModelRenderer getRandomModelBox(Random rand) {
         List<ModelRenderer> boxList = this.boxList;
         int size = boxList.size();
         int renderersWithBoxes = 0;
@@ -1181,14 +1131,14 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
         }
 
         if (renderersWithBoxes != 0) {
-            int random = par1Random.nextInt(renderersWithBoxes);
+            int randInt = rand.nextInt(renderersWithBoxes);
             renderersWithBoxes = -1;
 
             for (int i = 0; i < size; i++) {
                 ModelRenderer renderer = boxList.get(i);
                 if (canBeRandomBoxSource(renderer))
                     renderersWithBoxes++;
-                if (renderersWithBoxes == random)
+                if (renderersWithBoxes == randInt)
                     return renderer;
             }
         }
@@ -1221,7 +1171,7 @@ public abstract class MixinModelPlayer extends MixinModelBiped implements SmartM
         }
     }
 
-    private static float Factor(float x, float x0, float x1) {
+    private static float factor(float x, float x0, float x1) {
         if (x0 > x1) {
             if (x <= x1)
                 return 1F;
