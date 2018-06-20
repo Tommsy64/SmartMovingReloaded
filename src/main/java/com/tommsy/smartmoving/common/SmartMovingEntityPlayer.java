@@ -16,8 +16,8 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.network;
+package com.tommsy.smartmoving.common;
 
-public interface SmartMovingPacketSender {
-    void sendPacket(byte[] data);
+public interface SmartMovingEntityPlayer extends SmartMovingEntityLivingBase {
+    public SmartMovingPlayerState getState();
 }

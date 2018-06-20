@@ -21,8 +21,5 @@ package com.tommsy.smartmoving.client;
 import net.minecraft.client.Minecraft;
 
 public interface SmartMovingClientPlayer extends SmartMovingAbstractClientPlayer {
-    @Override
-    public SmartMovingClientPlayerHandler getPlayerHandler();
-
     public Minecraft getMinecraft();
 }

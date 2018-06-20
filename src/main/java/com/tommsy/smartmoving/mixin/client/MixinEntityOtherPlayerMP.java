@@ -24,21 +24,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.tommsy.smartmoving.client.SmartMovingOtherPlayer;
-import com.tommsy.smartmoving.client.SmartMovingOtherPlayerHandler;
 
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 
 @Mixin(EntityOtherPlayerMP.class)
 public abstract class MixinEntityOtherPlayerMP extends MixinAbstractClientPlayer implements SmartMovingOtherPlayer {
-    private SmartMovingOtherPlayerHandler playerHandler;
 
-    @Inject(method = "<init>*", at = @At("RETURN"))
+    @Inject(method = "<init>", at = @At("RETURN"))
     private void onConstructed(CallbackInfo ci) {
-        playerHandler = new SmartMovingOtherPlayerHandler(this);
-    }
 
-    @Override
-    public SmartMovingOtherPlayerHandler getPlayerHandler() {
-        return this.playerHandler;
     }
 }

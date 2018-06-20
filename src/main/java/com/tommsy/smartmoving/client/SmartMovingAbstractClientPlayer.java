@@ -18,13 +18,11 @@
 
 package com.tommsy.smartmoving.client;
 
-import com.tommsy.smartmoving.common.SmartMovingEntityLivingBase;
+import com.tommsy.smartmoving.common.SmartMovingEntityPlayer;
 
 import net.minecraft.entity.player.PlayerCapabilities;
 
-public interface SmartMovingAbstractClientPlayer extends SmartMovingEntityLivingBase {
-    public AbstractSmartMovingClientPlayerHandler getPlayerHandler();
-
+public interface SmartMovingAbstractClientPlayer extends SmartMovingEntityPlayer {
     public boolean isJumping();
 
     public PlayerCapabilities getCapabilities();

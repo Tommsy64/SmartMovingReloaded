@@ -22,8 +22,6 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
 import com.tommsy.smartmoving.client.SmartMovingClientEventHandler;
-import com.tommsy.smartmoving.common.statistics.SmartStatistics;
-import com.tommsy.smartmoving.network.SmartMovingNetworkHandler;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.common.MinecraftForge;
@@ -33,7 +31,6 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -56,7 +53,7 @@ public class SmartMovingMod {
         }
 
         public void init(FMLInitializationEvent event) {
-            NetworkRegistry.INSTANCE.newEventDrivenChannel(SmartMovingInfo.NETWORK_ID).register(new SmartMovingNetworkHandler());
+
         }
     }
 
@@ -78,8 +75,6 @@ public class SmartMovingMod {
             ClientRegistry.registerKeyBinding(keyBindGrab);
 
             MinecraftForge.EVENT_BUS.register(new SmartMovingClientEventHandler());
-
-            SmartStatistics.setCalculateHorizontalStats(true);
 
             // ClientRegistry.registerKeyBinding(Options.keyBindGrab);
             // ClientRegistry.registerKeyBinding(Options.keyBindConfigToggle);

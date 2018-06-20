@@ -20,6 +20,6 @@ package com.tommsy.smartmoving.client.render;
 
 import com.tommsy.smartmoving.client.model.SmartMovingModelPlayer;
 
-public interface ISmartMovingRenderPlayer {
+public interface IMixinRenderPlayer {
     public SmartMovingModelPlayer getMainModel();
 }

@@ -18,11 +18,6 @@
 
 package com.tommsy.smartmoving.client.model;
 
-import com.tommsy.smartmoving.client.render.ModelCapeRenderer;
-import com.tommsy.smartmoving.client.render.ModelEarsRenderer;
+public interface SmartMovingModelPlayer {
 
-public interface SmartMovingModelPlayer extends SmartMovingModelBiped {
-    public ModelEarsRenderer getBipedEars();
-
-    public ModelCapeRenderer getBipedCape();
 }

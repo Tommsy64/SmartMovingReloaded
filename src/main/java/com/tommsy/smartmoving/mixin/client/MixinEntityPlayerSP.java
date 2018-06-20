@@ -26,23 +26,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.tommsy.smartmoving.SmartMovingMod;
 import com.tommsy.smartmoving.client.SmartMovingClientPlayer;
-import com.tommsy.smartmoving.client.SmartMovingClientPlayerHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 
 @Mixin(EntityPlayerSP.class)
 public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer implements SmartMovingClientPlayer {
-    private SmartMovingClientPlayerHandler smPlayer;
 
-    @Inject(method = "<init>*", at = @At("RETURN"))
+    @Inject(method = "<init>", at = @At("RETURN"))
     private void onConstructed(CallbackInfo ci) {
-        smPlayer = new SmartMovingClientPlayerHandler(this);
-    }
 
-    @Override
-    public SmartMovingClientPlayerHandler getPlayerHandler() {
-        return this.smPlayer;
     }
 
     @Shadow
@@ -61,12 +54,11 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
     @Override
     public void travel(float strafe, float vertical, float forward) {
         super.travel(strafe, vertical, forward);
-        // statistics.calculateAllStats(false);
     }
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
     private void afterUpdateRidden(CallbackInfo ci) {
-        // statistics.calculateRiddenStats();
+
     }
 
     @Inject(method = "onUpdate", at = @At("HEAD"))
@@ -92,8 +84,9 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
     @Inject(method = "updateEntityActionState", at = @At("HEAD"), cancellable = true)
     private void updateEntityActionState(CallbackInfo ci) {
         if (SmartMovingMod.clientProxy.keyBindGrab.isKeyDown()) {
-            smPlayer.isCrawling = true;
+            playerState.isCrawling = true;
         } else
-            smPlayer.isCrawling = false;
+            playerState.isCrawling = false;
+
     }
 }

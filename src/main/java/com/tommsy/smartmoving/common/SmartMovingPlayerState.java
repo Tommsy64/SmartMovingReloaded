@@ -16,24 +16,8 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.client.render;
+package com.tommsy.smartmoving.common;
 
-public class Name {
-    public final String obfuscated;
-    public final String forgefuscated;
-    public final String deobfuscated;
-
-    public Name(String name) {
-        this(name, null);
-    }
-
-    public Name(String deobfuscatedName, String obfuscatedName) {
-        this(deobfuscatedName, null, obfuscatedName);
-    }
-
-    public Name(String deobfuscatedName, String forgefuscatedName, String obfuscatedName) {
-        deobfuscated = deobfuscatedName;
-        forgefuscated = forgefuscatedName;
-        obfuscated = obfuscatedName;
-    }
+public class SmartMovingPlayerState {
+    public boolean isCrawling;
 }
