@@ -25,11 +25,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.tommsy.smartmoving.common.SmartMovingEntityPlayer;
-import com.tommsy.smartmoving.common.SmartMovingPlayerState;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.PlayerCapabilities;
+
+import com.tommsy.smartmoving.common.SmartMovingEntityPlayer;
+import com.tommsy.smartmoving.common.SmartMovingPlayerState;
 
 @Mixin(EntityPlayer.class)
 public abstract class MixinEntityPlayer extends MixinEntityLivingBase implements SmartMovingEntityPlayer {

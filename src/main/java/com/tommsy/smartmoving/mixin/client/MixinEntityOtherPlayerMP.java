@@ -23,9 +23,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.tommsy.smartmoving.client.SmartMovingOtherPlayer;
-
 import net.minecraft.client.entity.EntityOtherPlayerMP;
+
+import com.tommsy.smartmoving.client.SmartMovingOtherPlayer;
 
 @Mixin(EntityOtherPlayerMP.class)
 public abstract class MixinEntityOtherPlayerMP extends MixinAbstractClientPlayer implements SmartMovingOtherPlayer {

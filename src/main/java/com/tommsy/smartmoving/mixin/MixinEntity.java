@@ -23,11 +23,11 @@ import java.util.List;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import com.tommsy.smartmoving.common.SmartMovingEntity;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
+
+import com.tommsy.smartmoving.common.SmartMovingEntity;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity implements SmartMovingEntity {

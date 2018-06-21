@@ -27,16 +27,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.tommsy.smartmoving.client.model.LayerPlayerArmor;
-import com.tommsy.smartmoving.client.model.SmartMovingModelPlayer;
-import com.tommsy.smartmoving.client.render.IMixinRenderPlayer;
-
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
+
+import com.tommsy.smartmoving.client.SmartMovingAbstractClientPlayer;
+import com.tommsy.smartmoving.client.model.LayerPlayerArmor;
+import com.tommsy.smartmoving.client.model.SmartMovingModelPlayer;
+import com.tommsy.smartmoving.client.render.IMixinRenderPlayer;
 
 @Mixin(RenderPlayer.class)
 @Implements(@Interface(iface = IMixinRenderPlayer.class, prefix = "sm$"))

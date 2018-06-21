@@ -20,11 +20,11 @@ package com.tommsy.smartmoving.mixin.client;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import com.tommsy.smartmoving.client.SmartMovingAbstractClientPlayer;
-import com.tommsy.smartmoving.mixin.MixinEntityPlayer;
-
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.entity.player.PlayerCapabilities;
+
+import com.tommsy.smartmoving.client.SmartMovingAbstractClientPlayer;
+import com.tommsy.smartmoving.mixin.MixinEntityPlayer;
 
 @Mixin(AbstractClientPlayer.class)
 public abstract class MixinAbstractClientPlayer extends MixinEntityPlayer implements SmartMovingAbstractClientPlayer {

@@ -18,9 +18,9 @@
 
 package com.tommsy.smartmoving.server;
 
-import com.tommsy.smartmoving.common.SmartMovingEntityLivingBase;
-
 import net.minecraft.server.MinecraftServer;
+
+import com.tommsy.smartmoving.common.SmartMovingEntityLivingBase;
 
 public interface SmartMovingServerPlayer extends SmartMovingEntityLivingBase {
     public MinecraftServer getMinecraftServer();

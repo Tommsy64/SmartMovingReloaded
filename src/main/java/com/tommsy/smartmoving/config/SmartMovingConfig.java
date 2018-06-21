@@ -18,10 +18,10 @@
 
 package com.tommsy.smartmoving.config;
 
-import com.tommsy.smartmoving.SmartMovingInfo;
-
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Name;
+
+import com.tommsy.smartmoving.SmartMovingInfo;
 
 /**
  * do not set the config variables client-side. Instead have two sets of config variables, the server set (always updated from the config file) and the client set (always received from the

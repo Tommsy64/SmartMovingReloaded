@@ -23,12 +23,12 @@ import java.util.Random;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import com.tommsy.smartmoving.common.SmartMovingEntityLivingBase;
-
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+
+import com.tommsy.smartmoving.common.SmartMovingEntityLivingBase;
 
 @Mixin(EntityLivingBase.class)
 public abstract class MixinEntityLivingBase extends MixinEntity implements SmartMovingEntityLivingBase {

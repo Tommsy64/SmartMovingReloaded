@@ -18,13 +18,13 @@
 
 package com.tommsy.smartmoving.client;
 
-import com.tommsy.smartmoving.SmartMovingInfo;
-
 import net.minecraftforge.common.config.Config.Type;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+
+import com.tommsy.smartmoving.SmartMovingInfo;
 
 public class SmartMovingClientEventHandler {
     @SubscribeEvent

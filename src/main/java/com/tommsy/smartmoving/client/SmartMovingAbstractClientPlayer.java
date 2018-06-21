@@ -18,9 +18,9 @@
 
 package com.tommsy.smartmoving.client;
 
-import com.tommsy.smartmoving.common.SmartMovingEntityPlayer;
-
 import net.minecraft.entity.player.PlayerCapabilities;
+
+import com.tommsy.smartmoving.common.SmartMovingEntityPlayer;
 
 public interface SmartMovingAbstractClientPlayer extends SmartMovingEntityPlayer {
     public boolean isJumping();
