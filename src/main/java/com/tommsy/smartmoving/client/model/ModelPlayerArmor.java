@@ -18,9 +18,19 @@
 
 package com.tommsy.smartmoving.client.model;
 
-import net.minecraft.client.model.ModelBiped;
+import java.util.Random;
 
-public class ModelPlayerArmor extends ModelBiped {
+import lombok.Getter;
+
+import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.entity.Entity;
+
+public class ModelPlayerArmor extends ModelBiped implements SmartMovingModelBiped {
+
+    @Getter
+    protected final SmartMovingModelBipedHandler handler;
+
     public ModelPlayerArmor() {
         this(0);
     }
@@ -31,5 +41,28 @@ public class ModelPlayerArmor extends ModelBiped {
 
     public ModelPlayerArmor(float modelSize, float p_i1149_2_, int textureWidth, int textureHeight) {
         super(modelSize, p_i1149_2_, textureWidth, textureHeight);
+        this.handler = new SmartMovingModelBipedHandler(this);
+        handler.initialize();
+    }
+
+    @Override
+    public void render(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+        handler.preRender(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+        super.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+        handler.postRender(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+    }
+
+    @Override
+    public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float headYawAngle, float headPitchAngle, float scaleFactor,
+            Entity entity) {
+        boolean cancel = handler.preSetRotationAngles(limbSwing, limbSwingAmount, ageInTicks, headYawAngle, headPitchAngle, scaleFactor, entity);
+        if (!cancel)
+            super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, headYawAngle, headPitchAngle, scaleFactor, entity);
+        handler.postSetRotationAngles(limbSwing, limbSwingAmount, ageInTicks, headYawAngle, headPitchAngle, scaleFactor, entity);
+    }
+
+    @Override
+    public ModelRenderer getRandomModelBox(Random rand) {
+        return handler.getRandomModelBox(rand);
     }
 }

@@ -18,48 +18,60 @@
 
 package com.tommsy.smartmoving.mixin.client;
 
-import org.spongepowered.asm.mixin.Implements;
-import org.spongepowered.asm.mixin.Interface;
-import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 
 import com.tommsy.smartmoving.client.SmartMovingAbstractClientPlayer;
+import com.tommsy.smartmoving.client.SmartMovingClientPlayer;
 import com.tommsy.smartmoving.client.model.LayerPlayerArmor;
+import com.tommsy.smartmoving.client.model.ModelPlayerArmor;
+import com.tommsy.smartmoving.client.model.SmartMovingModelBipedHandler;
 import com.tommsy.smartmoving.client.model.SmartMovingModelPlayer;
-import com.tommsy.smartmoving.client.render.IMixinRenderPlayer;
+import com.tommsy.smartmoving.client.model.SmartMovingModelPlayerHandler;
+import com.tommsy.smartmoving.client.render.ModelCapeRenderer;
+import com.tommsy.smartmoving.client.render.ModelEarsRenderer;
+
+import static com.tommsy.smartmoving.client.render.RenderUtils.RadianToAngle;
 
 @Mixin(RenderPlayer.class)
-@Implements(@Interface(iface = IMixinRenderPlayer.class, prefix = "sm$"))
 public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientPlayer> {
 
     private MixinRenderPlayer(RenderManager renderManagerIn, ModelBase modelBaseIn, float shadowSizeIn) {
         super(renderManagerIn, modelBaseIn, shadowSizeIn);
     }
 
+    private SmartMovingModelBipedHandler modelArmor, modelLeggings;
+
+    @Shadow
+    public abstract ModelPlayer getMainModel();
+
     @Redirect(method = "<init>(Lnet/minecraft/client/renderer/entity/RenderManager;Z)V", at = @At(value = "NEW", target = "Lnet/minecraft/client/renderer/entity/layers/LayerBipedArmor;"))
     private LayerBipedArmor constructLayerPlayerArmor(RenderLivingBase<?> $this) {
-        return new LayerPlayerArmor($this);
-    }
-
-    @Intrinsic
-    public SmartMovingModelPlayer sm$getMainModel() {
-        return (SmartMovingModelPlayer) super.getMainModel();
+        LayerPlayerArmor layerPlayerArmor = new LayerPlayerArmor($this);
+        modelArmor = ((ModelPlayerArmor) layerPlayerArmor.modelArmor).getHandler();
+        modelLeggings = ((ModelPlayerArmor) layerPlayerArmor.modelLeggings).getHandler();
+        return layerPlayerArmor;
     }
 
     @Inject(method = "doRender", at = @At("HEAD"))
     private void preDoRender(AbstractClientPlayer entityClientPlayer, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
-        // SmartMovingAbstractClientPlayer player = (SmartMovingAbstractClientPlayer) entityClientPlayer;
+        SmartMovingAbstractClientPlayer player = (SmartMovingAbstractClientPlayer) entityClientPlayer;
 
     }
 
@@ -69,12 +81,68 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
     }
 
     @Inject(method = "applyRotations", at = @At("HEAD"))
-    private void applyRotations(AbstractClientPlayer entityClientPlayer, float totalTime, float rotationYaw, float partialTicks, CallbackInfo ci) {}
+    private void preApplyRotations(AbstractClientPlayer entityClientPlayer, float totalTime, float rotationYaw, float partialTicks, CallbackInfo ci) {
+        SmartMovingModelPlayerHandler handle = ((SmartMovingModelPlayer) ((Object) getMainModel())).getHandler();
+
+        SmartMovingAbstractClientPlayer smPlayer = (SmartMovingAbstractClientPlayer) entityClientPlayer;
+
+        boolean isClientPlayer = smPlayer instanceof SmartMovingClientPlayer;
+        boolean isInventory = partialTicks == 1.0F && isClientPlayer &&
+                ((SmartMovingClientPlayer) smPlayer).getMinecraft().currentScreen instanceof GuiInventory;
+        if (!isInventory) {
+            float forwardRotation = entityClientPlayer.prevRotationYaw + (entityClientPlayer.rotationYaw - entityClientPlayer.prevRotationYaw) * partialTicks;
+
+            // if (handle.isClimbing() || handle.isClimbCrawling() || handle.isCrawlClimbing() || handle.isFlying() || handle.isSwimming() || handle.isDiving() ||
+            // handle.isCeilingClimbing() || handle.isHeadJumping || handle.isSliding() || handle.isAngleJumping())
+            // entityClientPlayer.renderYawOffset = forwardRotation;
+
+            if (entityClientPlayer.isPlayerSleeping()) {
+                rotationYaw = 0;
+                forwardRotation = 0;
+            }
+
+            float workingAngle;
+            Minecraft minecraft = Minecraft.getMinecraft();
+            if (!isClientPlayer) {
+                workingAngle = -entityClientPlayer.rotationYaw;
+                workingAngle += minecraft.getRenderViewEntity().rotationYaw;
+            } else
+                workingAngle = rotationYaw - entityClientPlayer.prevRotationYaw * RadianToAngle;
+
+            if (minecraft.gameSettings.thirdPersonView == 2 && !((EntityPlayer) minecraft.getRenderViewEntity()).isPlayerSleeping())
+                workingAngle += 180F;
+
+            modelLeggings.rotationYaw = modelArmor.rotationYaw = handle.rotationYaw = rotationYaw;
+
+            // IModelPlayer[] modelPlayers = irp.getRenderModels();
+
+            // for (int i = 0; i < modelPlayers.length; i++) {
+            // SmartRenderModel modelPlayer = modelPlayers[i].getRenderModel();
+            // SmartMovingModelPlayer modelPlayer = ((SmartMovingModelPlayer) ((Object) getMainModel()));
+            //
+            // modelPlayer.setRotationYaw(rotationYaw);
+            // modelPlayer.setForwardRotation(forwardRotation);
+            // modelPlayer.setWorkingAngle(workingAngle);
+            // }
+
+            rotationYaw = 0;
+        }
+    }
+
+    @Redirect(method = "applyRotations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderPlayer;applyRotations(Lnet/minecraft/client/renderer/entity/AbstractClientPlayer;FFF)V"), require = 2)
+    private void zeroRotationYaw(RenderPlayer $this, EntityLivingBase entityLiving, float p_77043_2_, float rotationYaw, float partialTicks) {
+        super.applyRotations((AbstractClientPlayer) entityLiving, p_77043_2_, 0, partialTicks);
+    }
 
     @Override
     protected void renderLayers(AbstractClientPlayer entityClientPlayer, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
             float headPitch, float scaleIn) {
+        ModelPlayer model = ((SmartMovingModelPlayer) ((Object) getMainModel())).getImplementation();
+        ((ModelEarsRenderer) model.bipedDeadmau5Head).beforeRender(entityClientPlayer);
+        ((ModelCapeRenderer) model.bipedCape).beforeRender(entityClientPlayer, partialTicks);
         super.renderLayers(entityClientPlayer, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scaleIn);
+        ((ModelCapeRenderer) model.bipedCape).afterRender();
+        ((ModelEarsRenderer) model.bipedDeadmau5Head).afterRender();
     }
 
     @Inject(method = "renderLivingAt", at = @At("HEAD"))

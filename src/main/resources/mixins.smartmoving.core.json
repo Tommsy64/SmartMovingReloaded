@@ -3,7 +3,7 @@
     "refmap": "mixins.smartmoving.refmap.json",
     "target": "@env(DEFAULT)",
     "compatibilityLevel": "JAVA_8",
-    "minVersion": "0.7.5",
+    "minVersion": "0.7.10",
     "mixins": [
         "MixinEntity",
         "MixinEntityLivingBase",
@@ -15,8 +15,7 @@
         "client.MixinEntityOtherPlayerMP",
         "client.MixinEntityPlayerSP",
         "client.MixinRenderPlayer",
-        "client.MixinModelPlayer",
-        "client.MixinModelBiped"
+        "client.MixinModelPlayer"
     ],
     "injectors": {
         "defaultRequire": 1

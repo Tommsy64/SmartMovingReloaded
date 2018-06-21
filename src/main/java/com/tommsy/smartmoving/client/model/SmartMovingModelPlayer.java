@@ -18,6 +18,14 @@
 
 package com.tommsy.smartmoving.client.model;
 
-public interface SmartMovingModelPlayer {
+import net.minecraft.client.model.ModelPlayer;
 
+public interface SmartMovingModelPlayer extends SmartMovingModelBiped {
+    @Override
+    public SmartMovingModelPlayerHandler getHandler();
+
+    @Override
+    public default ModelPlayer getImplementation() {
+        return (ModelPlayer) this;
+    }
 }

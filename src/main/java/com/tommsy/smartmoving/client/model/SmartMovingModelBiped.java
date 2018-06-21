@@ -16,10 +16,14 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.client.render;
+package com.tommsy.smartmoving.client.model;
 
-import com.tommsy.smartmoving.client.model.SmartMovingModelPlayer;
+import net.minecraft.client.model.ModelBiped;
 
-public interface IMixinRenderPlayer {
-    public SmartMovingModelPlayer getMainModel();
+public interface SmartMovingModelBiped {
+    public SmartMovingModelBipedHandler getHandler();
+
+    public default ModelBiped getImplementation() {
+        return (ModelBiped) this;
+    }
 }
