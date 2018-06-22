@@ -101,7 +101,7 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
             // handle.isCeilingClimbing() || handle.isHeadJumping || handle.isSliding() || handle.isAngleJumping())
             // entityClientPlayer.renderYawOffset = forwardRotation;
 
-            if (entityClientPlayer.isPlayerSleeping() || entityClientPlayer.isElytraFlying()) {
+            if (entityClientPlayer.isPlayerSleeping()) {
                 rotationYaw = 0;
                 // forwardRotation = 0;
             }

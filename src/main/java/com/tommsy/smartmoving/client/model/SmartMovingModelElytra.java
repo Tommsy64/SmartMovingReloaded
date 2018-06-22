@@ -37,10 +37,10 @@ public class SmartMovingModelElytra extends ModelBase {
     public SmartMovingModelElytra(SmartMovingModelPlayer smModel) {
         SmartMovingModelPlayerHandler handle = smModel.getHandler();
 
-        this.leftWing = new ModelSpecialRenderer(this, 22, 0, handle.bipedOuter);
+        this.leftWing = new ModelSpecialRenderer(this, 22, 0, handle.bipedTorso);
         this.leftWing.addBox(-10.0F, 0.0F, 0.0F, 10, 20, 2, 1.0F);
 
-        this.rightWing = new ModelSpecialRenderer(this, 22, 0, handle.bipedOuter);
+        this.rightWing = new ModelSpecialRenderer(this, 22, 0, handle.bipedTorso);
         this.rightWing.mirror = true;
         this.rightWing.addBox(0.0F, 0.0F, 0.0F, 10, 20, 2, 1.0F);
     }
