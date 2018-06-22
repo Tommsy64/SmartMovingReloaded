@@ -16,7 +16,7 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.client.render;
+package com.tommsy.smartmoving.client.renderer;
 
 import java.nio.FloatBuffer;
 
@@ -27,7 +27,7 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelRenderer;
 
-import static com.tommsy.smartmoving.client.render.RenderUtils.RadianToAngle;
+import static com.tommsy.smartmoving.client.renderer.RenderUtils.RadianToAngle;
 
 public class ModelRotationRenderer extends ModelRenderer {
 
@@ -45,6 +45,15 @@ public class ModelRotationRenderer extends ModelRenderer {
 
     public static enum RotationOrder {
         XYZ, XZY, YXZ, YZX, ZXY, ZYX
+    }
+
+    public ModelRotationRenderer(ModelBase modelBase, ModelRotationRenderer base) {
+        this(modelBase, -1, -1, base);
+    }
+
+    public ModelRotationRenderer(ModelBase modelBase, ModelRotationRenderer base, ModelRenderer original) {
+        this(modelBase, original.textureOffsetX, original.textureOffsetY, base);
+        copyFrom(original);
     }
 
     public ModelRotationRenderer(ModelBase modelBase, int texOffX, int texOffY, ModelRotationRenderer baseRenderer) {

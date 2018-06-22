@@ -16,12 +16,12 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.client.render;
+package com.tommsy.smartmoving.client.renderer;
 
 import net.minecraft.client.model.ModelBase;
 
-import static com.tommsy.smartmoving.client.render.RenderUtils.Half;
-import static com.tommsy.smartmoving.client.render.RenderUtils.Whole;
+import static com.tommsy.smartmoving.client.renderer.RenderUtils.Half;
+import static com.tommsy.smartmoving.client.renderer.RenderUtils.Whole;
 
 public class ModelPreviousRotationRenderer extends ModelRotationRenderer {
     public final PreviousRendererData previous;

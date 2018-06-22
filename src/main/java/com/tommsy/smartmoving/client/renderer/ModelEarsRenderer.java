@@ -16,7 +16,7 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.client.render;
+package com.tommsy.smartmoving.client.renderer;
 
 import org.lwjgl.opengl.GL11;
 
@@ -24,7 +24,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.player.EntityPlayer;
 
-import static com.tommsy.smartmoving.client.render.RenderUtils.RadianToAngle;
+import static com.tommsy.smartmoving.client.renderer.RenderUtils.RadianToAngle;
 
 public class ModelEarsRenderer extends ModelSpecialRenderer {
     private int _i = 0;

@@ -16,7 +16,7 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.client.render;
+package com.tommsy.smartmoving.client.renderer;
 
 import org.lwjgl.opengl.GL11;
 
@@ -25,9 +25,13 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.MathHelper;
 
-import static com.tommsy.smartmoving.client.render.RenderUtils.RadianToAngle;
+import static com.tommsy.smartmoving.client.renderer.RenderUtils.RadianToAngle;
 
 public class ModelCapeRenderer extends ModelSpecialRenderer {
+    private final ModelRotationRenderer outer;
+    private EntityPlayer entityplayer;
+    private float setFactor;
+
     public ModelCapeRenderer(ModelBase modelBase, int texOffX, int texOffY, ModelRotationRenderer baseRenderer, ModelRotationRenderer outerRenderer) {
         super(modelBase, texOffX, texOffY, baseRenderer);
         outer = outerRenderer;
@@ -92,8 +96,4 @@ public class ModelCapeRenderer extends ModelSpecialRenderer {
     public boolean canBeRandomBoxSource() {
         return false;
     }
-
-    private final ModelRotationRenderer outer;
-    private EntityPlayer entityplayer;
-    private float setFactor;
 }

@@ -28,17 +28,18 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
-import com.tommsy.smartmoving.client.render.ModelPreviousRotationRenderer;
-import com.tommsy.smartmoving.client.render.ModelRotationRenderer;
+import com.tommsy.smartmoving.SmartMovingMod;
+import com.tommsy.smartmoving.client.renderer.ModelPreviousRotationRenderer;
+import com.tommsy.smartmoving.client.renderer.ModelRotationRenderer;
 
-import static com.tommsy.smartmoving.client.render.RenderUtils.Eighth;
-import static com.tommsy.smartmoving.client.render.RenderUtils.Half;
-import static com.tommsy.smartmoving.client.render.RenderUtils.RadianToAngle;
-import static com.tommsy.smartmoving.client.render.RenderUtils.Whole;
+import static com.tommsy.smartmoving.client.renderer.RenderUtils.*;
+import static com.tommsy.smartmoving.client.renderer.RenderUtils.Eighth;
+import static com.tommsy.smartmoving.client.renderer.RenderUtils.RadianToAngle;
+import static com.tommsy.smartmoving.client.renderer.RenderUtils.Whole;
 
 public class SmartMovingModelBipedHandler {
 
@@ -92,21 +93,21 @@ public class SmartMovingModelBipedHandler {
         bipedOuter = new ModelPreviousRotationRenderer(model, -1, -1, null);
         bipedOuter.fadeEnabled = true;
 
-        bipedTorso = createRenderer(bipedOuter);
-        bipedBody = createRenderer(bipedTorso, model.bipedBody);
-        bipedBreast = createRenderer(bipedTorso);
-        bipedNeck = createRenderer(bipedBreast);
-        bipedHead = createRenderer(bipedNeck, model.bipedHead);
-        bipedRightShoulder = createRenderer(bipedBreast);
-        bipedRightArm = createRenderer(bipedRightShoulder, model.bipedRightArm);
-        bipedLeftShoulder = createRenderer(bipedBreast);
+        bipedTorso = new ModelRotationRenderer(model, bipedOuter);
+        bipedBody = new ModelRotationRenderer(model, bipedTorso, model.bipedBody);
+        bipedBreast = new ModelRotationRenderer(model, bipedTorso);
+        bipedNeck = new ModelRotationRenderer(model, bipedBreast);
+        bipedHead = new ModelRotationRenderer(model, bipedNeck, model.bipedHead);
+        bipedRightShoulder = new ModelRotationRenderer(model, bipedBreast);
+        bipedRightArm = new ModelRotationRenderer(model, bipedRightShoulder, model.bipedRightArm);
+        bipedLeftShoulder = new ModelRotationRenderer(model, bipedBreast);
         bipedLeftShoulder.mirror = true;
-        bipedLeftArm = createRenderer(bipedLeftShoulder, model.bipedLeftArm);
-        bipedPelvic = createRenderer(bipedTorso);
-        bipedRightLeg = createRenderer(bipedPelvic, model.bipedRightLeg);
-        bipedLeftLeg = createRenderer(bipedPelvic, model.bipedLeftLeg);
+        bipedLeftArm = new ModelRotationRenderer(model, bipedLeftShoulder, model.bipedLeftArm);
+        bipedPelvic = new ModelRotationRenderer(model, bipedTorso);
+        bipedRightLeg = new ModelRotationRenderer(model, bipedPelvic, model.bipedRightLeg);
+        bipedLeftLeg = new ModelRotationRenderer(model, bipedPelvic, model.bipedLeftLeg);
 
-        bipedHeadwear = createRenderer(bipedHead, model.bipedHeadwear);
+        bipedHeadwear = new ModelRotationRenderer(model, bipedHead, model.bipedHeadwear);
 
         model.bipedBody = bipedBody;
         model.bipedHead = bipedHead;
@@ -115,16 +116,6 @@ public class SmartMovingModelBipedHandler {
         model.bipedLeftArm = bipedLeftArm;
         model.bipedRightLeg = bipedRightLeg;
         model.bipedLeftLeg = bipedLeftLeg;
-    }
-
-    protected ModelRotationRenderer createRenderer(ModelRotationRenderer base) {
-        return new ModelRotationRenderer(model, -1, -1, base);
-    }
-
-    protected ModelRotationRenderer createRenderer(ModelRotationRenderer base, ModelRenderer original) {
-        ModelRotationRenderer renderer = new ModelRotationRenderer(model, original.textureOffsetX, original.textureOffsetY, base);
-        renderer.copyFrom(original);
-        return renderer;
     }
 
     public void preRender(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
@@ -201,12 +192,16 @@ public class SmartMovingModelBipedHandler {
 
         isStandardAnimation = true;
 
-        animateHeadRotation(totalHorizontalDistance, currentHorizontalSpeed, ageInTicks, headYawAngle, headPitchAngle, scaleFactor);
+        boolean elytaFlying = isElytraFlying((EntityLivingBase) entity);
+        animateHeadRotation(headYawAngle, headPitchAngle, elytaFlying);
+
+        animateElytraFlying((EntityLivingBase) entity, ageInTicks);
 
         if (((EntityPlayer) entity).isPlayerSleeping())
             animateSleeping();
 
-        animateArmSwinging(totalHorizontalDistance, currentHorizontalSpeed);
+        float elytraMagnitude = elytaFlying ? getElytraMagnitude(entity) : 1;
+        animateArmSwinging(totalHorizontalDistance, currentHorizontalSpeed, elytraMagnitude);
 
         if (model.isRiding)
             animateRiding();
@@ -240,7 +235,22 @@ public class SmartMovingModelBipedHandler {
         bipedOuter.fadeIntermediate(ageInTicks);
         bipedOuter.fadeStore(ageInTicks);
 
+        SmartMovingMod.logger.info("X: {} Y: {}", bipedOuter.rotateAngleX, bipedOuter.rotateAngleY);
+
         return true;
+    }
+
+    private boolean isElytraFlying(EntityLivingBase entity) {
+        return entity.getTicksElytraFlying() > 4;
+    }
+
+    private float getElytraMagnitude(Entity entity) {
+        float f = (float) (entity.motionX * entity.motionX + entity.motionY * entity.motionY + entity.motionZ * entity.motionZ);
+        f = f / 0.2F;
+        f = f * f * f;
+        if (f < 1.0F)
+            return 1;
+        return f;
     }
 
     public void postSetRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
@@ -276,11 +286,11 @@ public class SmartMovingModelBipedHandler {
             GL11.glPopMatrix();
     }
 
-    private void animateHeadRotation(float totalHorizontalDistance, float currentHorizontalSpeed, float ageInTicks, float headYawAngle, float headPitchAngle, float scaleFactor) {
+    private void animateHeadRotation(float headYawAngle, float headPitchAngle, boolean elytraFlying) {
         if (!isStandardAnimation) { return; }
-        bipedNeck.ignoreBase = true;
+        bipedNeck.ignoreBase = !elytraFlying;
         bipedHead.rotateAngleY = (rotationYaw + headYawAngle) / RadianToAngle;
-        bipedHead.rotateAngleX = headPitchAngle / RadianToAngle;
+        bipedHead.rotateAngleX = elytraFlying ? -Eighth : headPitchAngle / RadianToAngle;
     }
 
     private void animateSleeping() {
@@ -291,12 +301,12 @@ public class SmartMovingModelBipedHandler {
         bipedTorso.rotationPointZ = -17F;
     }
 
-    private void animateArmSwinging(float totalHorizontalDistance, float currentHorizontalSpeed) {
-        bipedRightArm.rotateAngleX = MathHelper.cos(totalHorizontalDistance * 0.6662F + Half) * 2.0F * currentHorizontalSpeed * 0.5F;
-        bipedLeftArm.rotateAngleX = MathHelper.cos(totalHorizontalDistance * 0.6662F) * 2.0F * currentHorizontalSpeed * 0.5F;
+    private void animateArmSwinging(float totalHorizontalDistance, float currentHorizontalSpeed, float elytraMagnitude) {
+        bipedRightArm.rotateAngleX = MathHelper.cos(totalHorizontalDistance * 0.6662F + Half) * 2.0F * currentHorizontalSpeed * 0.5F / elytraMagnitude;
+        bipedLeftArm.rotateAngleX = MathHelper.cos(totalHorizontalDistance * 0.6662F) * 2.0F * currentHorizontalSpeed * 0.5F / elytraMagnitude;
 
-        bipedRightLeg.rotateAngleX = MathHelper.cos(totalHorizontalDistance * 0.6662F) * 1.4F * currentHorizontalSpeed;
-        bipedLeftLeg.rotateAngleX = MathHelper.cos(totalHorizontalDistance * 0.6662F + Half) * 1.4F * currentHorizontalSpeed;
+        bipedRightLeg.rotateAngleX = MathHelper.cos(totalHorizontalDistance * 0.6662F) * 1.4F * currentHorizontalSpeed / elytraMagnitude;
+        bipedLeftLeg.rotateAngleX = MathHelper.cos(totalHorizontalDistance * 0.6662F + Half) * 1.4F * currentHorizontalSpeed / elytraMagnitude;
     }
 
     private void animateRiding() {
@@ -325,7 +335,7 @@ public class SmartMovingModelBipedHandler {
         bipedBreast.rotationOrder = bipedBody.rotationOrder = ModelRotationRenderer.RotationOrder.YXZ;
         bipedLeftArm.rotateAngleX += angle;
 
-        EnumHandSide enumhandside = this.getMainHand(entity);
+        EnumHandSide enumhandside = model.getMainHand(entity);
         if (enumhandside == EnumHandSide.LEFT)
             this.bipedBody.rotateAngleY *= -1.0F;
 
@@ -369,7 +379,7 @@ public class SmartMovingModelBipedHandler {
     private void animateBowAimingLeft(float totalTime) {
         bipedRightArm.rotateAngleZ = 0.0F;
         bipedLeftArm.rotateAngleZ = 0.0F;
-        bipedRightArm.rotateAngleY = -0.1F + bipedHead.rotateAngleY - 0.4F - bipedOuter.rotateAngleY;
+        bipedRightArm.rotateAngleY = -0.1F + bipedHead.rotateAngleY - bipedOuter.rotateAngleY - 0.4F;
         bipedLeftArm.rotateAngleY = 0.1F + bipedHead.rotateAngleY - bipedOuter.rotateAngleY;
         bipedRightArm.rotateAngleX = -1.570796F + bipedHead.rotateAngleX;
         bipedLeftArm.rotateAngleX = -1.570796F + bipedHead.rotateAngleX;
@@ -383,7 +393,7 @@ public class SmartMovingModelBipedHandler {
         bipedRightArm.rotateAngleZ = 0.0F;
         bipedLeftArm.rotateAngleZ = 0.0F;
         bipedRightArm.rotateAngleY = -0.1F + bipedHead.rotateAngleY - bipedOuter.rotateAngleY;
-        bipedLeftArm.rotateAngleY = 0.1F + bipedHead.rotateAngleY + 0.4F - bipedOuter.rotateAngleY;
+        bipedLeftArm.rotateAngleY = 0.1F + bipedHead.rotateAngleY - bipedOuter.rotateAngleY + 0.4F;
         bipedRightArm.rotateAngleX = -1.570796F + bipedHead.rotateAngleX;
         bipedLeftArm.rotateAngleX = -1.570796F + bipedHead.rotateAngleX;
         bipedRightArm.rotateAngleZ += MathHelper.cos(totalTime * 0.09F) * 0.05F + 0.05F;
@@ -392,18 +402,31 @@ public class SmartMovingModelBipedHandler {
         bipedLeftArm.rotateAngleX -= MathHelper.sin(totalTime * 0.067F) * 0.05F;
     }
 
-    private ModelRenderer getArmForSide(EnumHandSide side) {
-        return side == EnumHandSide.LEFT ? this.bipedLeftArm : this.bipedRightArm;
+    private void animateElytraFlying(EntityLivingBase entity, float partialTicks) {
+        if (!entity.isElytraFlying())
+            return;
+
+        bipedOuter.setRotationPoint(0, 0, 0);
+
+        float f = (float) entity.getTicksElytraFlying() + partialTicks;
+        float f1 = MathHelper.clamp(f * f / 100.0F, 0.0F, 1.0F);
+        bipedOuter.rotateAngleZ = Quarter;
+        // GlStateManager.rotate(f1 * (-90.0F - entity.rotationPitch), 1.0F, 0.0F, 0.0F);
+        // bipedOuter.rotateAngleX = f1 * (-90.0F - entity.rotationPitch) / RadianToAngle;
+        Vec3d vec3d = entity.getLook(partialTicks);
+        double d0 = entity.motionX * entity.motionX + entity.motionZ * entity.motionZ;
+        double d1 = vec3d.x * vec3d.x + vec3d.z * vec3d.z;
+
+        if (d0 > 0.0D && d1 > 0.0D) {
+            double d2 = (entity.motionX * vec3d.x + entity.motionZ * vec3d.z) / (Math.sqrt(d0) * Math.sqrt(d1));
+            double d3 = entity.motionX * vec3d.z - entity.motionZ * vec3d.x;
+            // GlStateManager.rotate((float) (Math.signum(d3) * Math.acos(d2)) * RenderUtils.RadianToAngle, 0.0F, 1.0F, 0.0F);
+            // bipedOuter.rotateAngleY = (float) (Math.signum(d3) * Math.acos(d2));
+        }
     }
 
-    private EnumHandSide getMainHand(Entity entity) {
-        if (entity instanceof EntityLivingBase) {
-            EntityLivingBase entitylivingbase = (EntityLivingBase) entity;
-            EnumHandSide enumhandside = entitylivingbase.getPrimaryHand();
-            return entitylivingbase.swingingHand == EnumHand.MAIN_HAND ? enumhandside : enumhandside.opposite();
-        } else {
-            return EnumHandSide.RIGHT;
-        }
+    private ModelRenderer getArmForSide(EnumHandSide side) {
+        return side == EnumHandSide.LEFT ? this.bipedLeftArm : this.bipedRightArm;
     }
 
     public ModelRenderer getRandomModelBox(Random rand) {

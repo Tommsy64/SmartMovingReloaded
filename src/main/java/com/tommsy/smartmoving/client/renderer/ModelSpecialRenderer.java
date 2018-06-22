@@ -16,7 +16,7 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.client.render;
+package com.tommsy.smartmoving.client.renderer;
 
 import org.lwjgl.opengl.GL11;
 

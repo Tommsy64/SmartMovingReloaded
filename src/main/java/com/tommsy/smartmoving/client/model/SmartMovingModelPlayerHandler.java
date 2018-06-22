@@ -23,11 +23,11 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.entity.Entity;
 
-import com.tommsy.smartmoving.client.render.ModelCapeRenderer;
-import com.tommsy.smartmoving.client.render.ModelEarsRenderer;
-import com.tommsy.smartmoving.client.render.ModelRotationRenderer;
+import com.tommsy.smartmoving.client.renderer.ModelCapeRenderer;
+import com.tommsy.smartmoving.client.renderer.ModelEarsRenderer;
+import com.tommsy.smartmoving.client.renderer.ModelRotationRenderer;
 
-import static com.tommsy.smartmoving.client.render.RenderUtils.Sixtyfourth;
+import static com.tommsy.smartmoving.client.renderer.RenderUtils.Sixtyfourth;
 
 public class SmartMovingModelPlayerHandler extends SmartMovingModelBipedHandler {
 
@@ -53,11 +53,11 @@ public class SmartMovingModelPlayerHandler extends SmartMovingModelBipedHandler 
     @Override
     protected void initializeRenderers() {
         super.initializeRenderers();
-        bipedBodywear = createRenderer(bipedBody, model.bipedBodyWear);
-        bipedRightArmwear = createRenderer(bipedRightArm, model.bipedRightArmwear);
-        bipedLeftArmwear = createRenderer(bipedLeftArm, model.bipedLeftArmwear);
-        bipedRightLegwear = createRenderer(bipedRightLeg, model.bipedRightLegwear);
-        bipedLeftLegwear = createRenderer(bipedLeftLeg, model.bipedLeftLegwear);
+        bipedBodywear = new ModelRotationRenderer(model, bipedBody, model.bipedBodyWear);
+        bipedRightArmwear = new ModelRotationRenderer(model, bipedRightArm, model.bipedRightArmwear);
+        bipedLeftArmwear = new ModelRotationRenderer(model, bipedLeftArm, model.bipedLeftArmwear);
+        bipedRightLegwear = new ModelRotationRenderer(model, bipedRightLeg, model.bipedRightLegwear);
+        bipedLeftLegwear = new ModelRotationRenderer(model, bipedLeftLeg, model.bipedLeftLegwear);
 
         bipedCape = new ModelCapeRenderer(model, 0, 0, bipedBreast, bipedOuter);
         bipedCape.copyFrom(model.bipedCape);

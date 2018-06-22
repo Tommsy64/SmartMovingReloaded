@@ -16,20 +16,21 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.client.render;
+package com.tommsy.smartmoving.client.renderer.layers;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
 
-@SideOnly(Side.CLIENT)
-public class RenderUtils {
-    public static final float Whole = (float) Math.PI * 2F;
-    public static final float Half = (float) Math.PI;
-    public static final float Quarter = Half / 2F;
-    public static final float Eighth = Quarter / 2F;
-    public static final float Sixteenth = Eighth / 2F;
-    public static final float Thirtysecond = Sixteenth / 2F;
-    public static final float Sixtyfourth = Thirtysecond / 2F;
+import com.tommsy.smartmoving.client.model.ModelPlayerArmor;
 
-    public static final float RadianToAngle = 360F / Whole;
+public class LayerPlayerArmor extends LayerBipedArmor {
+    public LayerPlayerArmor(RenderLivingBase<?> entity) {
+        super(entity);
+    }
+
+    @Override
+    protected void initArmor() {
+        this.modelLeggings = new ModelPlayerArmor(0.5F);
+        this.modelArmor = new ModelPlayerArmor(1.0F);
+    }
 }

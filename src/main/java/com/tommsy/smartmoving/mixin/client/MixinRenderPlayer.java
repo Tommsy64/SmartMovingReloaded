@@ -22,10 +22,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.model.ModelBase;
@@ -34,20 +35,19 @@ import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
+import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 
 import com.tommsy.smartmoving.client.SmartMovingAbstractClientPlayer;
 import com.tommsy.smartmoving.client.SmartMovingClientPlayer;
-import com.tommsy.smartmoving.client.model.LayerPlayerArmor;
 import com.tommsy.smartmoving.client.model.ModelPlayerArmor;
 import com.tommsy.smartmoving.client.model.SmartMovingModelBipedHandler;
 import com.tommsy.smartmoving.client.model.SmartMovingModelPlayer;
 import com.tommsy.smartmoving.client.model.SmartMovingModelPlayerHandler;
-import com.tommsy.smartmoving.client.render.ModelCapeRenderer;
-import com.tommsy.smartmoving.client.render.ModelEarsRenderer;
-
-import static com.tommsy.smartmoving.client.render.RenderUtils.RadianToAngle;
+import com.tommsy.smartmoving.client.renderer.ModelCapeRenderer;
+import com.tommsy.smartmoving.client.renderer.ModelEarsRenderer;
+import com.tommsy.smartmoving.client.renderer.layers.LayerPlayerArmor;
+import com.tommsy.smartmoving.client.renderer.layers.SmartMovingLayerElytra;
 
 @Mixin(RenderPlayer.class)
 public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientPlayer> {
@@ -62,11 +62,16 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
     public abstract ModelPlayer getMainModel();
 
     @Redirect(method = "<init>(Lnet/minecraft/client/renderer/entity/RenderManager;Z)V", at = @At(value = "NEW", target = "Lnet/minecraft/client/renderer/entity/layers/LayerBipedArmor;"))
-    private LayerBipedArmor constructLayerPlayerArmor(RenderLivingBase<?> $this) {
+    private LayerBipedArmor constructLayerPlayerArmor(RenderLivingBase<AbstractClientPlayer> $this) {
         LayerPlayerArmor layerPlayerArmor = new LayerPlayerArmor($this);
         modelArmor = ((ModelPlayerArmor) layerPlayerArmor.modelArmor).getHandler();
         modelLeggings = ((ModelPlayerArmor) layerPlayerArmor.modelLeggings).getHandler();
         return layerPlayerArmor;
+    }
+
+    @ModifyArg(method = "<init>(Lnet/minecraft/client/renderer/entity/RenderManager;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderPlayer;addLayer(Lnet/minecraft/client/renderer/entity/layers/LayerRenderer;)Z", ordinal = 0), slice = @Slice(from = @At(value = "NEW", target = "Lnet/minecraft/client/renderer/entity/layers/LayerElytra;")), index = 0)
+    private LayerRenderer<? extends EntityLivingBase> constructSmartMovingLayerElytra(LayerRenderer<? extends EntityLivingBase> layerRenderer) {
+        return new SmartMovingLayerElytra(this);
     }
 
     @Inject(method = "doRender", at = @At("HEAD"))
@@ -87,33 +92,33 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
         SmartMovingAbstractClientPlayer smPlayer = (SmartMovingAbstractClientPlayer) entityClientPlayer;
 
         boolean isClientPlayer = smPlayer instanceof SmartMovingClientPlayer;
-        boolean isInventory = partialTicks == 1.0F && isClientPlayer &&
+        boolean isBeingRenderedInInventory = partialTicks == 1.0F && isClientPlayer &&
                 ((SmartMovingClientPlayer) smPlayer).getMinecraft().currentScreen instanceof GuiInventory;
-        if (!isInventory) {
-            float forwardRotation = entityClientPlayer.prevRotationYaw + (entityClientPlayer.rotationYaw - entityClientPlayer.prevRotationYaw) * partialTicks;
+        if (!isBeingRenderedInInventory) {
+            // float forwardRotation = entityClientPlayer.prevRotationYaw + (entityClientPlayer.rotationYaw - entityClientPlayer.prevRotationYaw) * partialTicks;
 
             // if (handle.isClimbing() || handle.isClimbCrawling() || handle.isCrawlClimbing() || handle.isFlying() || handle.isSwimming() || handle.isDiving() ||
             // handle.isCeilingClimbing() || handle.isHeadJumping || handle.isSliding() || handle.isAngleJumping())
             // entityClientPlayer.renderYawOffset = forwardRotation;
 
-            if (entityClientPlayer.isPlayerSleeping()) {
+            if (entityClientPlayer.isPlayerSleeping() || entityClientPlayer.isElytraFlying()) {
                 rotationYaw = 0;
-                forwardRotation = 0;
+                // forwardRotation = 0;
             }
 
-            float workingAngle;
-            Minecraft minecraft = Minecraft.getMinecraft();
-            if (!isClientPlayer) {
-                workingAngle = -entityClientPlayer.rotationYaw;
-                workingAngle += minecraft.getRenderViewEntity().rotationYaw;
-            } else
-                workingAngle = rotationYaw - entityClientPlayer.prevRotationYaw * RadianToAngle;
-
-            if (minecraft.gameSettings.thirdPersonView == 2 && !((EntityPlayer) minecraft.getRenderViewEntity()).isPlayerSleeping())
-                workingAngle += 180F;
+            // float workingAngle;
+            // Minecraft minecraft = Minecraft.getMinecraft();
+            // if (!isClientPlayer) {
+            // workingAngle = -entityClientPlayer.rotationYaw;
+            // workingAngle += minecraft.getRenderViewEntity().rotationYaw;
+            // } else
+            // workingAngle = rotationYaw - entityClientPlayer.prevRotationYaw * RadianToAngle;
+            //
+            // if (minecraft.gameSettings.thirdPersonView == 2 && !((EntityPlayer) minecraft.getRenderViewEntity()).isPlayerSleeping())
+            // workingAngle += 180F;
 
             modelLeggings.rotationYaw = modelArmor.rotationYaw = handle.rotationYaw = rotationYaw;
-
+            modelLeggings.isBeingRenderedInInventory = modelArmor.isBeingRenderedInInventory = handle.isBeingRenderedInInventory = false;
             // IModelPlayer[] modelPlayers = irp.getRenderModels();
 
             // for (int i = 0; i < modelPlayers.length; i++) {
@@ -124,14 +129,17 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
             // modelPlayer.setForwardRotation(forwardRotation);
             // modelPlayer.setWorkingAngle(workingAngle);
             // }
-
-            rotationYaw = 0;
         }
     }
 
-    @Redirect(method = "applyRotations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderPlayer;applyRotations(Lnet/minecraft/client/renderer/entity/AbstractClientPlayer;FFF)V"), require = 2)
-    private void zeroRotationYaw(RenderPlayer $this, EntityLivingBase entityLiving, float p_77043_2_, float rotationYaw, float partialTicks) {
+    @Redirect(method = "applyRotations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderLivingBase;applyRotations(Lnet/minecraft/client/renderer/entity/AbstractClientPlayer;FFF)V"), require = 2)
+    private void zeroRotationYaw(RenderLivingBase<AbstractClientPlayer> $this, EntityLivingBase entityLiving, float p_77043_2_, float rotationYaw, float partialTicks) {
         super.applyRotations((AbstractClientPlayer) entityLiving, p_77043_2_, 0, partialTicks);
+    }
+
+    @Redirect(method = "applyRotations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;isElytraFlying()Z"))
+    private boolean ignoreElytraFlying(AbstractClientPlayer abstractClientPlayer) {
+        return false;
     }
 
     @Override
