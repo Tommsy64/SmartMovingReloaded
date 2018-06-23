@@ -132,7 +132,7 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
         }
     }
 
-    @Redirect(method = "applyRotations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderLivingBase;applyRotations(Lnet/minecraft/client/renderer/entity/AbstractClientPlayer;FFF)V"), require = 2)
+    @Redirect(method = "applyRotations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderLivingBase;applyRotations(Lnet/minecraft/entity/EntityLivingBase;FFF)V"), require = 2)
     private void zeroRotationYaw(RenderLivingBase<AbstractClientPlayer> $this, EntityLivingBase entityLiving, float p_77043_2_, float rotationYaw, float partialTicks) {
         super.applyRotations((AbstractClientPlayer) entityLiving, p_77043_2_, 0, partialTicks);
     }

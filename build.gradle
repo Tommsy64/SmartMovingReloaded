@@ -18,15 +18,15 @@ buildscript {
 
 plugins {
     id "com.diffplug.gradle.spotless" version "3.13.0"
-    id 'io.franzbecker.gradle-lombok' version '1.14'
+    id 'io.franzbecker.gradle-lombok' version '1.11'
+    id 'java'
+    id 'eclipse'
     id "com.github.johnrengelman.shadow" version "2.0.4"
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'java'
-apply plugin: 'eclipse'
 
 file "build.properties" withReader {
     def prop = new Properties()
@@ -155,6 +155,7 @@ shadowJar {
 
     // Exclude ForgeGradle classes from shaded JAR
     exclude 'dummyThing'
+    exclude 'LICENSE*'
 
     // Wait for reobf task to be fully configured
     afterEvaluate {
