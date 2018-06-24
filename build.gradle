@@ -83,6 +83,7 @@ dependencies {
         exclude module: 'asm-tree'
         exclude module: 'launchwrapper'
         exclude module: 'guava'
+        exclude module: 'gson'
         exclude module: 'log4j-core'
     }
     runtime 'org.jetbrains.java.decompiler:fernflower:sponge-SNAPSHOT'
