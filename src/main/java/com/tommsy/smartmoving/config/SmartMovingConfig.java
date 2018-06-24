@@ -19,7 +19,9 @@
 package com.tommsy.smartmoving.config;
 
 import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.Config.Comment;
 import net.minecraftforge.common.config.Config.Name;
+import net.minecraftforge.common.config.Config.RangeDouble;
 
 import com.tommsy.smartmoving.SmartMovingMod.SmartMovingInfo;
 
@@ -31,11 +33,12 @@ import com.tommsy.smartmoving.SmartMovingMod.SmartMovingInfo;
 public final class SmartMovingConfig {
 
     @Name("Subcat Name")
-    public static SubCategory subcat = new SubCategory();
+    public static Movement movement = new Movement();
 
-    private static class SubCategory {
-        public boolean someBool;
-        public int relatedInt;
+    public static class Movement {
+        @Comment("Fall distance for stopping ground based moves like crawling or sliding (>= 0)")
+        @RangeDouble(min = 0)
+        public float fallingDistanceStart = 3;
     }
 
     private SmartMovingConfig() {}

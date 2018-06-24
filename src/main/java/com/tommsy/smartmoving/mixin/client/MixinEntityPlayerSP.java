@@ -29,10 +29,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.MovementInput;
+import net.minecraft.util.math.AxisAlignedBB;
 
 import com.tommsy.smartmoving.client.SmartMovingClientPlayer;
 import com.tommsy.smartmoving.client.SmartMovingInput;
 import com.tommsy.smartmoving.common.SmartMovingPlayerState;
+import com.tommsy.smartmoving.config.SmartMovingConfig;
 import com.tommsy.smartmoving.network.SmartMovingNetworkHandler;
 
 @Mixin(EntityPlayerSP.class)
@@ -93,6 +95,14 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
 
     }
 
+    @Inject(method = "onLivingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;onInputUpdate(Lnet/minecraft/client/entity/EntityPlayer;Lnet/minecraft/util/MovementInput;)V"), remap = false)
+    private void movementInputCorrection(CallbackInfo ci) {
+        if (!movementInput.sneak && this.playerState.isCrawling) {
+            movementInput.moveStrafe = (float) ((double) movementInput.moveStrafe * 0.3D);
+            movementInput.moveForward = (float) ((double) movementInput.moveForward * 0.3D);
+        }
+    }
+
     @Inject(method = "onLivingUpdate", at = @At("RETURN"))
     private void postOnLivingUpdate(CallbackInfo ci) {
 
@@ -105,14 +115,33 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
         if (this.isElytraFlying())
             playerState.isCrawling = playerState.isCrouching = false;
 
-        if (playerState.isCrawling)
-            playerState.isCrawling = playerInput.grab.pressed;
-        else
-            playerState.isCrawling = (playerInput.grab.startPressed && playerInput.sneak.pressed && this.onGround) && !this.capabilities.isFlying;
+        boolean mustCrawl = false;
+        if (playerState.isCrawling) {
+            mustCrawl = checkForCollision(0.6F, 1.8F);
+        }
+
+        if (!mustCrawl) {
+            boolean canCrawl = this.fallDistance < SmartMovingConfig.movement.fallingDistanceStart;
+            if (canCrawl) {
+                if (playerState.isCrawling)
+                    playerState.isCrawling = playerInput.grab.pressed;
+                else
+                    playerState.isCrawling = (playerInput.grab.startPressed && playerInput.sneak.pressed && this.onGround) && !this.capabilities.isFlying;
+            } else
+                playerState.isCrawling = false;
+        }
 
         playerState.isCrouching = !playerState.isCrawling && playerInput.sneak.pressed;
 
         sendPlayerState();
+    }
+
+    @Unique
+    private boolean checkForCollision(float width, float height) {
+        AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
+        axisalignedbb = new AxisAlignedBB(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ,
+                axisalignedbb.minX + (double) width, axisalignedbb.minY + (double) height, axisalignedbb.minZ + (double) width);
+        return this.world.collidesWithAnyBlock(axisalignedbb);
     }
 
     @Unique
