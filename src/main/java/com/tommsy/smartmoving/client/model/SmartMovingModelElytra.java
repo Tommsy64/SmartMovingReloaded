@@ -79,9 +79,9 @@ public class SmartMovingModelElytra extends ModelBase {
 
     public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entity) {
         super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entity);
-        float f = 0.2617994F;
-        float f1 = -0.2617994F;
-        float f2 = 0.0F;
+        float angleFromNeck = 0.2617994F;
+        float wingSpread = -0.2617994F;
+        float offsetFromNeck = 0.0F;
         float f3 = 0.0F;
 
         SmartMovingAbstractClientPlayer smPlayer = (SmartMovingAbstractClientPlayer) entity;
@@ -95,27 +95,27 @@ public class SmartMovingModelElytra extends ModelBase {
                 f4 = 1.0F - (float) Math.pow(-vec3d.y, 1.5D);
             }
 
-            f = f4 * 0.34906584F + (1.0F - f4) * f;
-            f1 = f4 * -((float) Math.PI / 2F) + (1.0F - f4) * f1;
+            angleFromNeck = f4 * 0.34906584F + (1.0F - f4) * angleFromNeck;
+            wingSpread = f4 * -((float) Math.PI / 2F) + (1.0F - f4) * wingSpread;
         } else if (state.isCrouching) {
-            f = RenderUtils.Whole / 9F;
-            f1 = -RenderUtils.Eighth;
-            f2 = 3.0F;
+            angleFromNeck = RenderUtils.Whole / 9F;
+            wingSpread = -RenderUtils.Eighth;
+            offsetFromNeck = 3.0F;
             f3 = RenderUtils.Half / 36F;
         } else if (state.isCrawling) {
-            f = -RenderUtils.Sixtyfourth / 3F;
-            f1 = -RenderUtils.Sixteenth;
-            f2 = 3.0F;
+            angleFromNeck = RenderUtils.Sixtyfourth;
+            wingSpread = -RenderUtils.Sixteenth;
+            offsetFromNeck = 3.0F;
             f3 = RenderUtils.Half / 36F;
         }
 
         this.leftWing.rotationPointX = 5.0F;
-        this.leftWing.rotationPointY = f2;
+        this.leftWing.rotationPointY = offsetFromNeck;
 
         AbstractClientPlayer abstractclientplayer = (AbstractClientPlayer) entity;
-        abstractclientplayer.rotateElytraX = (float) ((double) abstractclientplayer.rotateElytraX + (double) (f - abstractclientplayer.rotateElytraX) * 0.1D);
+        abstractclientplayer.rotateElytraX = (float) ((double) abstractclientplayer.rotateElytraX + (double) (angleFromNeck - abstractclientplayer.rotateElytraX) * 0.1D);
         abstractclientplayer.rotateElytraY = (float) ((double) abstractclientplayer.rotateElytraY + (double) (f3 - abstractclientplayer.rotateElytraY) * 0.1D);
-        abstractclientplayer.rotateElytraZ = (float) ((double) abstractclientplayer.rotateElytraZ + (double) (f1 - abstractclientplayer.rotateElytraZ) * 0.1D);
+        abstractclientplayer.rotateElytraZ = (float) ((double) abstractclientplayer.rotateElytraZ + (double) (wingSpread - abstractclientplayer.rotateElytraZ) * 0.1D);
         this.leftWing.rotateAngleX = abstractclientplayer.rotateElytraX;
         this.leftWing.rotateAngleY = abstractclientplayer.rotateElytraY;
         this.leftWing.rotateAngleZ = abstractclientplayer.rotateElytraZ;
