@@ -20,8 +20,8 @@ package com.tommsy.smartmoving.server;
 
 import net.minecraft.server.MinecraftServer;
 
-import com.tommsy.smartmoving.common.SmartMovingEntityLivingBase;
+import com.tommsy.smartmoving.common.SmartMovingEntityPlayer;
 
-public interface SmartMovingServerPlayer extends SmartMovingEntityLivingBase {
+public interface SmartMovingServerPlayer extends SmartMovingEntityPlayer {
     public MinecraftServer getMinecraftServer();
 }

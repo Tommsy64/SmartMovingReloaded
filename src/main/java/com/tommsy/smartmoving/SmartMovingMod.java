@@ -18,6 +18,9 @@
 
 package com.tommsy.smartmoving;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
@@ -32,10 +35,24 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import com.tommsy.smartmoving.SmartMovingMod.SmartMovingInfo;
 import com.tommsy.smartmoving.client.SmartMovingClientEventHandler;
+import com.tommsy.smartmoving.network.SmartMovingNetworkHandler;
 
 @Mod(modid = SmartMovingInfo.MODID, name = SmartMovingInfo.NAME, version = SmartMovingInfo.VERSION/* @MCVERSIONDEP@ */)
 public class SmartMovingMod {
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public final class SmartMovingInfo {
+        public static final String MODID = "@MODID@";
+        public static final String NAME = "@NAME@";
+        public static final String VERSION = "@VERSION@";
+
+        // public static final String COMMUNICATION_VERSION = "0.0.1";
+        public static final String NETWORK_ID = "SmrtMvng";
+
+        public static final String CONFIG_FILE_NAME = "SmartMoving";
+    }
+
     public static Logger logger;
 
     @SidedProxy(serverSide = "com.tommsy.smartmoving.SmartMovingMod$CommonProxy", clientSide = "com.tommsy.smartmoving.SmartMovingMod$ClientProxy")
@@ -53,7 +70,7 @@ public class SmartMovingMod {
         }
 
         public void init(FMLInitializationEvent event) {
-
+            SmartMovingNetworkHandler.registerMessages();
         }
     }
 
@@ -81,7 +98,7 @@ public class SmartMovingMod {
             // ClientRegistry.registerKeyBinding(Options.keyBindSpeedIncrease);
             // ClientRegistry.registerKeyBinding(Options.keyBindSpeedDecrease);
 
-            SmartMovingMod.logger.info("Using communication protocal version {}", SmartMovingInfo.COMMUNICATION_VERSION);
+            // SmartMovingMod.logger.info("Using communication protocal version {}", SmartMovingInfo.COMMUNICATION_VERSION);
         }
     }
 

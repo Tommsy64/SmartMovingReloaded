@@ -27,7 +27,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import com.tommsy.smartmoving.client.SmartMovingAbstractClientPlayer;
 import com.tommsy.smartmoving.client.renderer.ModelSpecialRenderer;
+import com.tommsy.smartmoving.client.renderer.RenderUtils;
+import com.tommsy.smartmoving.common.SmartMovingPlayerState;
 
 @SideOnly(Side.CLIENT)
 public class SmartMovingModelElytra extends ModelBase {
@@ -37,10 +40,10 @@ public class SmartMovingModelElytra extends ModelBase {
     public SmartMovingModelElytra(SmartMovingModelPlayer smModel) {
         SmartMovingModelPlayerHandler handle = smModel.getHandler();
 
-        this.leftWing = new ModelSpecialRenderer(this, 22, 0, handle.bipedTorso);
+        this.leftWing = new ModelSpecialRenderer(this, 22, 0, handle.bipedBody);
         this.leftWing.addBox(-10.0F, 0.0F, 0.0F, 10, 20, 2, 1.0F);
 
-        this.rightWing = new ModelSpecialRenderer(this, 22, 0, handle.bipedTorso);
+        this.rightWing = new ModelSpecialRenderer(this, 22, 0, handle.bipedBody);
         this.rightWing.mirror = true;
         this.rightWing.addBox(0.0F, 0.0F, 0.0F, 10, 20, 2, 1.0F);
     }
@@ -81,7 +84,10 @@ public class SmartMovingModelElytra extends ModelBase {
         float f2 = 0.0F;
         float f3 = 0.0F;
 
-        if (entity instanceof EntityLivingBase && ((EntityLivingBase) entity).isElytraFlying()) {
+        SmartMovingAbstractClientPlayer smPlayer = (SmartMovingAbstractClientPlayer) entity;
+        SmartMovingPlayerState state = smPlayer.getState();
+
+        if (((EntityLivingBase) entity).isElytraFlying()) {
             float f4 = 1.0F;
 
             if (entity.motionY < 0.0D) {
@@ -91,11 +97,16 @@ public class SmartMovingModelElytra extends ModelBase {
 
             f = f4 * 0.34906584F + (1.0F - f4) * f;
             f1 = f4 * -((float) Math.PI / 2F) + (1.0F - f4) * f1;
-        } else if (entity.isSneaking()) {
-            f = ((float) Math.PI * 2F / 9F);
-            f1 = -((float) Math.PI / 4F);
+        } else if (state.isCrouching) {
+            f = RenderUtils.Whole / 9F;
+            f1 = -RenderUtils.Eighth;
             f2 = 3.0F;
-            f3 = 0.08726646F;
+            f3 = RenderUtils.Half / 36F;
+        } else if (state.isCrawling) {
+            f = -RenderUtils.Sixtyfourth / 3F;
+            f1 = -RenderUtils.Sixteenth;
+            f2 = 3.0F;
+            f3 = RenderUtils.Half / 36F;
         }
 
         this.leftWing.rotationPointX = 5.0F;

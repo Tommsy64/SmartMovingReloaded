@@ -19,23 +19,32 @@
 package com.tommsy.smartmoving.mixin.client;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.util.MovementInput;
 
-import com.tommsy.smartmoving.SmartMovingMod;
 import com.tommsy.smartmoving.client.SmartMovingClientPlayer;
+import com.tommsy.smartmoving.client.SmartMovingInput;
+import com.tommsy.smartmoving.common.SmartMovingPlayerState;
+import com.tommsy.smartmoving.network.SmartMovingNetworkHandler;
 
 @Mixin(EntityPlayerSP.class)
 public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer implements SmartMovingClientPlayer {
 
+    private SmartMovingInput playerInput;
+    private SmartMovingPlayerState previousPlayerState;
+
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onConstructed(CallbackInfo ci) {
-
+        this.playerInput = new SmartMovingInput(mc.gameSettings);
+        previousPlayerState = new SmartMovingPlayerState();
     }
 
     @Shadow
@@ -46,9 +55,17 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
         return mc;
     }
 
+    @Shadow
+    public MovementInput movementInput;
+
     @Override
     protected void jump() {
         super.jump();
+    }
+
+    @Overwrite
+    public boolean isSneaking() {
+        return playerState.isSneaking();
     }
 
     @Override
@@ -57,36 +74,51 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
     }
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
-    private void afterUpdateRidden(CallbackInfo ci) {
+    private void postUpdateRidden(CallbackInfo ci) {
 
     }
 
     @Inject(method = "onUpdate", at = @At("HEAD"))
-    private void beforeOnUpdate(CallbackInfo ci) {
+    private void preOnUpdate(CallbackInfo ci) {
 
     }
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
-    private void afterOnUpdate(CallbackInfo ci) {
+    private void postOnUpdate(CallbackInfo ci) {
 
     }
 
     @Inject(method = "onLivingUpdate", at = @At("HEAD"))
-    private void beforeOnLivingUpdate(CallbackInfo ci) {
+    private void preOnLivingUpdate(CallbackInfo ci) {
 
     }
 
     @Inject(method = "onLivingUpdate", at = @At("RETURN"))
-    private void afterOnLivingUpdate(CallbackInfo ci) {
+    private void postOnLivingUpdate(CallbackInfo ci) {
 
     }
 
-    @Inject(method = "updateEntityActionState", at = @At("HEAD"), cancellable = true)
-    private void updateEntityActionState(CallbackInfo ci) {
-        if (SmartMovingMod.clientProxy.keyBindGrab.isKeyDown()) {
-            playerState.isCrawling = true;
-        } else
-            playerState.isCrawling = false;
+    @Inject(method = "updateEntityActionState", at = @At("RETURN"), cancellable = true)
+    private void postUpdateEntityActionState(CallbackInfo ci) {
+        playerInput.update();
 
+        if (this.isElytraFlying())
+            playerState.isCrawling = playerState.isCrouching = false;
+
+        if (playerState.isCrawling)
+            playerState.isCrawling = playerInput.grab.pressed;
+        else
+            playerState.isCrawling = (playerInput.grab.startPressed && playerInput.sneak.pressed && this.onGround) && !this.capabilities.isFlying;
+
+        playerState.isCrouching = !playerState.isCrawling && playerInput.sneak.pressed;
+
+        sendPlayerState();
+    }
+
+    @Unique
+    private void sendPlayerState() {
+        if (!playerState.equals(previousPlayerState))
+            SmartMovingNetworkHandler.sendClientPlayerStateChange(playerState);
+        previousPlayerState.copy(this.playerState);
     }
 }

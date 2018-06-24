@@ -90,4 +90,7 @@ public abstract class MixinEntityLivingBase extends MixinEntity implements Smart
 
     @Shadow
     public abstract ItemStack getActiveItemStack();
+
+    @Shadow
+    public abstract boolean isElytraFlying();
 }

@@ -24,7 +24,7 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEve
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 
-import com.tommsy.smartmoving.SmartMovingInfo;
+import com.tommsy.smartmoving.SmartMovingMod.SmartMovingInfo;
 
 public class SmartMovingClientEventHandler {
     @SubscribeEvent

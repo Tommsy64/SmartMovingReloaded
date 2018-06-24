@@ -74,12 +74,13 @@ public abstract class MixinEntity implements SmartMovingEntity {
     public abstract AxisAlignedBB getEntityBoundingBox();
 
     @Shadow
-    public boolean isSneaking() {
-        return false;
-    }
+    public abstract boolean isSneaking();
 
     @Shadow
     public abstract void setEntityBoundingBox(AxisAlignedBB bb);
+
+    @Shadow
+    protected abstract void setSize(float width, float height);
 
     @Shadow
     public void setPosition(double x, double y, double z) {}

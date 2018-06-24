@@ -131,9 +131,6 @@ public class SmartMovingModelBipedHandler {
 
     public void preRender(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
         GL11.glPushMatrix();
-        // if (entity.isSneaking())
-        // GL11.glTranslatef(0.0F, 0.2F, 0.0F); // Why?
-
         bipedBody.ignoreRender = bipedHead.ignoreRender = bipedRightArm.ignoreRender = bipedLeftArm.ignoreRender = bipedRightLeg.ignoreRender = bipedLeftLeg.ignoreRender = bipedHeadwear.ignoreRender = true;
     }
 
@@ -215,6 +212,8 @@ public class SmartMovingModelBipedHandler {
             float walkFactor = factor(horizontalSpeed, 0F, 0.12951545F);
             float standFactor = factor(horizontalSpeed, 0.12951545F, 0F);
 
+            bipedTorso.offsetZ = -0.85f;
+
             bipedHead.rotateAngleZ = -headYawAngle / RadianToAngle;
             bipedHead.rotateAngleX = -Eighth;
             bipedHead.rotationPointZ = -2F;
@@ -253,7 +252,7 @@ public class SmartMovingModelBipedHandler {
                         1F + (MathHelper.cos(distance + Quarter) - 1F) * 0.15F * walkFactor,
                         1F + (MathHelper.cos(distance - Quarter) - 1F) * 0.15F * walkFactor);
         } else if (player.isElytraFlying())
-            animateElytraFlying((EntityLivingBase) entity, partialTicks);
+            animateElytraFlying((EntityLivingBase) entity, partialTicks, ageInTicks);
         else
             isStandardAnimation = true;
 
@@ -263,7 +262,9 @@ public class SmartMovingModelBipedHandler {
             animateSleeping();
 
         float elytraMagnitude = player.getTicksElytraFlying() > 4 ? getElytraMagnitude(entity) : 1;
-        animateArmSwinging(totalHorizontalDistance, currentHorizontalSpeed, elytraMagnitude);
+        if (isStandardAnimation || elytraMagnitude != 1) {
+            animateArmSwinging(totalHorizontalDistance, currentHorizontalSpeed, elytraMagnitude);
+        }
 
         if (model.isRiding)
             animateRiding();
@@ -409,6 +410,7 @@ public class SmartMovingModelBipedHandler {
     }
 
     private void animateSneaking() {
+        if (!isStandardAnimation) { return; }
         bipedTorso.rotateAngleX += 0.5F;
         bipedRightLeg.rotateAngleX += -0.5F;
         bipedLeftLeg.rotateAngleX += -0.5F;
@@ -458,7 +460,7 @@ public class SmartMovingModelBipedHandler {
         bipedLeftArm.rotateAngleX -= MathHelper.sin(totalTime * 0.067F) * 0.05F;
     }
 
-    private void animateElytraFlying(EntityLivingBase entity, float partialTicks) {
+    private void animateElytraFlying(EntityLivingBase entity, float partialTicks, float totalTime) {
         bipedTorso.rotationOrder = RotationOrder.YZX;
         bipedTorso.rotationPointY = 23.5F;
         bipedTorso.offsetY = -1.15f;
@@ -474,6 +476,11 @@ public class SmartMovingModelBipedHandler {
             double d3 = entity.motionX * vec3d.z - entity.motionZ * vec3d.x;
             bipedTorso.rotateAngleY = (float) (Math.signum(d3) * Math.acos(d2));
         }
+
+        bipedRightArm.rotateAngleZ += MathHelper.cos(totalTime * 0.09F) * 0.05F + 0.05F;
+        bipedLeftArm.rotateAngleZ -= MathHelper.cos(totalTime * 0.09F) * 0.05F + 0.05F;
+        bipedRightArm.rotateAngleX += MathHelper.sin(totalTime * 0.067F) * 0.05F;
+        bipedLeftArm.rotateAngleX -= MathHelper.sin(totalTime * 0.067F) * 0.05F;
     }
 
     private void setArmScales(float rightScale, float leftScale) {

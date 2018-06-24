@@ -18,6 +18,32 @@
 
 package com.tommsy.smartmoving.common;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import io.netty.buffer.ByteBuf;
+
+@ToString
+@EqualsAndHashCode
 public class SmartMovingPlayerState {
     public boolean isCrawling;
+    public boolean isCrouching;
+
+    public boolean isSneaking() {
+        return isCrouching || isCrawling;
+    }
+
+    public void copy(SmartMovingPlayerState other) {
+        this.isCrawling = other.isCrawling;
+        this.isCrouching = other.isCrouching;
+    }
+
+    public void writeToBuffer(ByteBuf buf) {
+        buf.writeBoolean(isCrawling);
+        buf.writeBoolean(isCrouching);
+    }
+
+    public void readFromBuffer(ByteBuf buf) {
+        this.isCrawling = buf.readBoolean();
+        this.isCrouching = buf.readBoolean();
+    }
 }

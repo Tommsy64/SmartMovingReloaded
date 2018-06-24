@@ -63,7 +63,7 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
 
     @Redirect(method = "<init>(Lnet/minecraft/client/renderer/entity/RenderManager;Z)V", at = @At(value = "NEW", target = "Lnet/minecraft/client/renderer/entity/layers/LayerBipedArmor;"))
     private LayerBipedArmor constructLayerPlayerArmor(RenderLivingBase<AbstractClientPlayer> $this) {
-        LayerPlayerArmor layerPlayerArmor = new LayerPlayerArmor($this);
+        LayerPlayerArmor layerPlayerArmor = new LayerPlayerArmor(this);
         modelArmor = ((ModelPlayerArmor) layerPlayerArmor.modelArmor).getHandler();
         modelLeggings = ((ModelPlayerArmor) layerPlayerArmor.modelLeggings).getHandler();
         return layerPlayerArmor;
