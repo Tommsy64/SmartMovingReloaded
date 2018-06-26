@@ -65,8 +65,7 @@ public class ClientPlayerStateChangeMessage implements IMessage {
             message.stateBytes.retain();
             SmartMovingNetworkHandler.sendServerPlayerStateChange(message.stateBytes.duplicate(), player);
             player.getServerWorld().addScheduledTask(() -> {
-                SmartMovingPlayerState state = ((SmartMovingServerPlayer) player).getState();
-                message.writeToPlayerState(state);
+                message.writeToPlayerState(((SmartMovingServerPlayer) player).getState());
             });
             return null;
         }

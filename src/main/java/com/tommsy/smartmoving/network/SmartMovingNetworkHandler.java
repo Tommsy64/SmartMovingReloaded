@@ -22,13 +22,16 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 import com.tommsy.smartmoving.SmartMovingMod.SmartMovingInfo;
 import com.tommsy.smartmoving.common.SmartMovingPlayerState;
+import com.tommsy.smartmoving.config.SmartMovingConfigAccess;
 import com.tommsy.smartmoving.network.ClientPlayerStateChangeMessage.ClientPlayerStateChangeHandler;
+import com.tommsy.smartmoving.network.ConfigUpdateMessage.ConfigUpdateMessageHandler;
 import com.tommsy.smartmoving.network.ServerPlayerStateChangeMessage.ServerPlayerStateChangeHandler;
 
 import io.netty.buffer.ByteBuf;
@@ -38,9 +41,10 @@ public final class SmartMovingNetworkHandler {
     private static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(SmartMovingInfo.NETWORK_ID);
 
     public static void registerMessages() {
-        int i = 0; // Message discriminator
-        INSTANCE.registerMessage(ClientPlayerStateChangeHandler.class, ClientPlayerStateChangeMessage.class, i++, Side.SERVER);
-        INSTANCE.registerMessage(ServerPlayerStateChangeHandler.class, ServerPlayerStateChangeMessage.class, i++, Side.CLIENT);
+        INSTANCE.registerMessage(ServerPlayerStateChangeHandler.class, ServerPlayerStateChangeMessage.class, 0, Side.CLIENT);
+        INSTANCE.registerMessage(ClientPlayerStateChangeHandler.class, ClientPlayerStateChangeMessage.class, 1, Side.SERVER);
+
+        INSTANCE.registerMessage(ConfigUpdateMessageHandler.class, ConfigUpdateMessage.class, 2, Side.CLIENT);
     }
 
     public static void sendClientPlayerStateChange(SmartMovingPlayerState state) {
@@ -49,5 +53,13 @@ public final class SmartMovingNetworkHandler {
 
     public static void sendServerPlayerStateChange(ByteBuf stateBytes, Entity entity) {
         INSTANCE.sendToAllTracking(new ServerPlayerStateChangeMessage(stateBytes, entity.getEntityId()), entity);
+    }
+
+    public static void sendConfigUpdate(EntityPlayerMP player) {
+        INSTANCE.sendTo(new ConfigUpdateMessage(SmartMovingConfigAccess.LOCAL_CONFIG), player);
+    }
+
+    public static void sendConfigUpdateToAll() {
+        INSTANCE.sendToAll(new ConfigUpdateMessage(SmartMovingConfigAccess.LOCAL_CONFIG));
     }
 }

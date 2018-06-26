@@ -20,6 +20,7 @@ package com.tommsy.smartmoving.common;
 
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+
 import io.netty.buffer.ByteBuf;
 
 @ToString

@@ -34,7 +34,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import com.tommsy.smartmoving.client.SmartMovingClientPlayer;
 import com.tommsy.smartmoving.client.SmartMovingInput;
 import com.tommsy.smartmoving.common.SmartMovingPlayerState;
-import com.tommsy.smartmoving.config.SmartMovingConfig;
+import com.tommsy.smartmoving.config.SmartMovingConfigAccess;
 import com.tommsy.smartmoving.network.SmartMovingNetworkHandler;
 
 @Mixin(EntityPlayerSP.class)
@@ -121,7 +121,7 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
         }
 
         if (!mustCrawl) {
-            boolean canCrawl = this.fallDistance < SmartMovingConfig.movement.fallingDistanceStart;
+            boolean canCrawl = this.fallDistance < SmartMovingConfigAccess.config.movement.fallingDistanceStart;
             if (canCrawl) {
                 if (playerState.isCrawling)
                     playerState.isCrawling = playerInput.grab.pressed;

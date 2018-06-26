@@ -24,13 +24,18 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEve
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 
+import com.tommsy.smartmoving.SmartMovingMod;
 import com.tommsy.smartmoving.SmartMovingMod.SmartMovingInfo;
+import com.tommsy.smartmoving.network.SmartMovingNetworkHandler;
 
 public class SmartMovingClientEventHandler {
     @SubscribeEvent
     public void onConfigChangedEvent(OnConfigChangedEvent event) {
-        if (event.getModID().equals(SmartMovingInfo.MODID))
-            ConfigManager.sync(SmartMovingInfo.MODID, Type.INSTANCE);
+        if (!event.getModID().equals(SmartMovingInfo.MODID))
+            return;
+        ConfigManager.sync(SmartMovingInfo.MODID, Type.INSTANCE);
+        SmartMovingMod.logger.debug("Config updated, synchronizing to all players.");
+        SmartMovingNetworkHandler.sendConfigUpdateToAll();
     }
 
     @SubscribeEvent

@@ -63,17 +63,17 @@ public class ServerPlayerStateChangeMessage implements IMessage {
 
     // Default constructor implicitly defined
     public static class ServerPlayerStateChangeHandler implements IMessageHandler<ServerPlayerStateChangeMessage, IMessage> {
-        private static final Minecraft MC = Minecraft.getMinecraft();
-
         @Override
         public IMessage onMessage(ServerPlayerStateChangeMessage message, MessageContext ctx) {
-            Entity entity = MC.world.getEntityByID(message.entityId);
+            Entity entity = Minecraft.getMinecraft().world.getEntityByID(message.entityId);
             if (entity == null)
                 SmartMovingMod.logger.warn("Null entity when handling {}", message.getClass().getSimpleName());
             else if (!(entity instanceof SmartMovingOtherPlayer))
                 SmartMovingMod.logger.warn("Entity not instance of {} when handling {}", SmartMovingOtherPlayer.class.getSimpleName(), message.getClass().getSimpleName());
             else
-                message.writeToPlayerState(((SmartMovingOtherPlayer) entity).getState());
+                Minecraft.getMinecraft().addScheduledTask(() -> {
+                    message.writeToPlayerState(((SmartMovingOtherPlayer) entity).getState());
+                });
             return null;
         }
     }

@@ -109,7 +109,8 @@ public abstract class MixinEntityPlayer extends MixinEntityLivingBase implements
         net.minecraftforge.fml.common.FMLCommonHandler.instance().onPlayerPostTick((EntityPlayer) ((Object) this));
     }
 
-    @Shadow
+    // Not obfuscated. Added by forge?
+    @Shadow(remap = false)
     public float eyeHeight;
 
     /**

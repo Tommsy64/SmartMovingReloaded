@@ -16,8 +16,17 @@
 * along with Smart Moving Reloaded.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.tommsy.smartmoving.common;
+package com.tommsy.smartmoving.server;
 
-public class SmartMovingEventHandler {
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 
+import com.tommsy.smartmoving.network.SmartMovingNetworkHandler;
+
+public class SmartMovingServerEventHandler {
+    @SubscribeEvent
+    public void onPlayerLogin(PlayerLoggedInEvent event) {
+        SmartMovingNetworkHandler.sendConfigUpdate((EntityPlayerMP) event.player);
+    }
 }

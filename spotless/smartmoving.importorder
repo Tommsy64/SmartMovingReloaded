@@ -1,7 +1,9 @@
 #Organize Import Order
-5=\#com.tommsy.smartmoving.client.render.RenderUtils
-4=com
-3=net
-2=org
+#Tue Jun 26 09:57:32 EDT 2018
+6=\#com.tommsy.smartmoving.client.render.RenderUtils
+5=com
+4=net
+3=org
+2=lombok
 1=javax
 0=java

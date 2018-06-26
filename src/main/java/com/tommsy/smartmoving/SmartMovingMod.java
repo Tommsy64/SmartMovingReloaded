@@ -38,6 +38,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.tommsy.smartmoving.SmartMovingMod.SmartMovingInfo;
 import com.tommsy.smartmoving.client.SmartMovingClientEventHandler;
 import com.tommsy.smartmoving.network.SmartMovingNetworkHandler;
+import com.tommsy.smartmoving.server.SmartMovingServerEventHandler;
 
 @Mod(modid = SmartMovingInfo.MODID, name = SmartMovingInfo.NAME, version = SmartMovingInfo.VERSION/* @MCVERSIONDEP@ */)
 public class SmartMovingMod {
@@ -47,7 +48,6 @@ public class SmartMovingMod {
         public static final String NAME = "@NAME@";
         public static final String VERSION = "@VERSION@";
 
-        // public static final String COMMUNICATION_VERSION = "0.0.1";
         public static final String NETWORK_ID = "SmrtMvng";
 
         public static final String CONFIG_FILE_NAME = "SmartMoving";
@@ -55,7 +55,7 @@ public class SmartMovingMod {
 
     public static Logger logger;
 
-    @SidedProxy(serverSide = "com.tommsy.smartmoving.SmartMovingMod$CommonProxy", clientSide = "com.tommsy.smartmoving.SmartMovingMod$ClientProxy")
+    @SidedProxy(serverSide = "com.tommsy.smartmoving.SmartMovingMod$ServerProxy", clientSide = "com.tommsy.smartmoving.SmartMovingMod$ClientProxy")
     public static CommonProxy proxy;
 
     /**
@@ -74,6 +74,14 @@ public class SmartMovingMod {
         }
     }
 
+    public static class ServerProxy extends CommonProxy {
+        @Override
+        public void init(FMLInitializationEvent event) {
+            super.init(event);
+            MinecraftForge.EVENT_BUS.register(new SmartMovingServerEventHandler());
+        }
+    }
+
     public static class ClientProxy extends CommonProxy {
         public KeyBinding keyBindGrab;
 
@@ -86,7 +94,6 @@ public class SmartMovingMod {
         @Override
         public void init(FMLInitializationEvent event) {
             super.init(event);
-
             keyBindGrab = new KeyBinding("key.grab.desc", Keyboard.KEY_R, "key.categories.movement");
 
             ClientRegistry.registerKeyBinding(keyBindGrab);
