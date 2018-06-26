@@ -8,6 +8,7 @@ Smart Moving Reloaded
 * Updated to Minecraft 1.12.2
 * Easier to maintain
 * Better compatibility with other mods
+* Fixes long-standing vanilla bug [MC-90598](https://bugs.mojang.com/browse/MC-90598)
 
 Developing
 ----------
