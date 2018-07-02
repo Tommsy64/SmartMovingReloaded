@@ -1,6 +1,7 @@
 {
     "package": "com.tommsy.smartmoving.mixin",
     "refmap": "mixins.smartmoving.refmap.json",
+    "required": true,
     "target": "@env(DEFAULT)",
     "compatibilityLevel": "JAVA_8",
     "minVersion": "0.7.10",

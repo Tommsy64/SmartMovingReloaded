@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
@@ -95,8 +96,9 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
 
     }
 
-    @Inject(method = "onLivingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;onInputUpdate(Lnet/minecraft/client/entity/EntityPlayer;Lnet/minecraft/util/MovementInput;)V"), remap = false)
-    private void movementInputCorrection(CallbackInfo ci) {
+    @Redirect(method = "onLivingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/MovementInput;updatePlayerMoveState()V"))
+    private void movementInputCorrection(MovementInput movementInput) {
+        movementInput.updatePlayerMoveState();
         if (!movementInput.sneak && this.playerState.isCrawling) {
             movementInput.moveStrafe = (float) ((double) movementInput.moveStrafe * 0.3D);
             movementInput.moveForward = (float) ((double) movementInput.moveForward * 0.3D);

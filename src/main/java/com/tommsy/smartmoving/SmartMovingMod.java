@@ -40,7 +40,7 @@ import com.tommsy.smartmoving.client.SmartMovingClientEventHandler;
 import com.tommsy.smartmoving.network.SmartMovingNetworkHandler;
 import com.tommsy.smartmoving.server.SmartMovingServerEventHandler;
 
-@Mod(modid = SmartMovingInfo.MODID, name = SmartMovingInfo.NAME, version = SmartMovingInfo.VERSION/* @MCVERSIONDEP@ */, dependencies = "required:forge@[14.23.1.2589,);")
+@Mod(modid = SmartMovingInfo.MODID, name = SmartMovingInfo.NAME, version = SmartMovingInfo.VERSION/* @MCVERSIONDEP@ */, dependencies = "required:forge@[14.23.4.2705,);")
 public class SmartMovingMod {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public final class SmartMovingInfo {
