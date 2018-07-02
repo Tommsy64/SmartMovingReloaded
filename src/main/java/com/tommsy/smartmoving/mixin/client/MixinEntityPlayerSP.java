@@ -99,9 +99,12 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
     @Redirect(method = "onLivingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/MovementInput;updatePlayerMoveState()V"))
     private void movementInputCorrection(MovementInput movementInput) {
         movementInput.updatePlayerMoveState();
-        if (!movementInput.sneak && this.playerState.isCrawling) {
+        if (this.playerState.isCrouching) {
             movementInput.moveStrafe = (float) ((double) movementInput.moveStrafe * 0.3D);
             movementInput.moveForward = (float) ((double) movementInput.moveForward * 0.3D);
+        } else if (this.playerState.isCrawling) {
+            movementInput.moveStrafe = (float) ((double) movementInput.moveStrafe * 0.15D);
+            movementInput.moveForward = (float) ((double) movementInput.moveForward * 0.15D);
         }
     }
 

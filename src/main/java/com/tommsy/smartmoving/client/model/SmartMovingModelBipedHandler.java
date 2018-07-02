@@ -212,7 +212,7 @@ public class SmartMovingModelBipedHandler {
             float walkFactor = factor(horizontalSpeed, 0F, 0.12951545F);
             float standFactor = factor(horizontalSpeed, 0.12951545F, 0F);
 
-            bipedTorso.offsetZ = -0.85f;
+            bipedTorso.offsetZ = -0.87f;
 
             bipedHead.rotateAngleZ = -headYawAngle / RadianToAngle;
             bipedHead.rotateAngleX = -Eighth;

@@ -16,7 +16,8 @@
         "client.MixinEntityOtherPlayerMP",
         "client.MixinEntityPlayerSP",
         "client.MixinRenderPlayer",
-        "client.MixinModelPlayer"
+        "client.MixinModelPlayer",
+        "client.MixinMovementInputFromOptions"
     ],
     "injectors": {
         "defaultRequire": 1
