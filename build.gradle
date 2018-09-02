@@ -17,8 +17,9 @@ buildscript {
 }
 
 plugins {
-    id "com.diffplug.gradle.spotless" version "3.13.0"
-    id 'io.franzbecker.gradle-lombok' version '1.11'
+    id 'io.franzbecker.gradle-lombok' version '1.14'
+    id 'net.ltgt.apt' version '0.18'
+    id "com.diffplug.gradle.spotless" version "3.14.0"
     id 'java'
     id 'eclipse'
     id "com.github.johnrengelman.shadow" version "2.0.4"
@@ -68,7 +69,6 @@ repositories {
         name = 'sponge'
         url = 'http://repo.spongepowered.org/maven'
     }
-    jcenter() // required for Lombok dependency
 }
 
 sourceSets {
@@ -86,12 +86,13 @@ dependencies {
         exclude module: 'gson'
         exclude module: 'log4j-core'
     }
+    annotationProcessor 'org.spongepowered:mixin:0.7.10-SNAPSHOT'
     runtime 'org.jetbrains.java.decompiler:fernflower:sponge-SNAPSHOT'
 }
 
 lombok {
-    version = "1.18.0"
-    sha256 = "88ed9af526d13a84361cbe1216f815ee78c82c342618ea1a48b6de1acbb9d2b4"
+    version = '1.18.2'
+    sha256 = 'f13db210efa2092a58bb7befce58ffa502e5fefc5e1099f45007074008756bc0'
 }
 
 jar {

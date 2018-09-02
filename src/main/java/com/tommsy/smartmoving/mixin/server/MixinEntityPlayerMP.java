@@ -41,14 +41,14 @@ public abstract class MixinEntityPlayerMP extends MixinEntityPlayer implements S
 
     @Shadow
     @Final
-    public MinecraftServer mcServer;
+    public MinecraftServer server;
 
     @Shadow
     public NetHandlerPlayServer connection;
 
     @Override
     public MinecraftServer getMinecraftServer() {
-        return this.mcServer;
+        return this.server;
     }
 
     public boolean crawlingInitialized;
