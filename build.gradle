@@ -104,9 +104,8 @@ jar {
                 'Created-By': System.properties['java.vm.version'] + ' (' + System.properties['java.vm.vendor'] + ')',
                 'Implementation-Title': project.name,
                 'Implementation-Version': version,
-                "Implementation-Vendor": url,
+                'Implementation-Vendor': url,
                 'FMLCorePlugin': project.group + '.core.SmartMovingPlugin',
-                // 'FMLCorePluginContainsFMLMod': 'true', // Seems to cause mod to not load in dev environment
                 'ForceLoadAsMod': true,
                 'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
                 'TweakOrder': 0,
@@ -153,6 +152,12 @@ shadowJar {
     classifier ''
     dependencies {
         include dependency('org.spongepowered:mixin')
+    }
+
+    manifest {
+        attributes(
+            'FMLCorePluginContainsFMLMod': true // Adding this line to the manifest used in the dev envioronment causes only the coremod to load and not the main mod
+        )
     }
 
     // Exclude ForgeGradle classes from shaded JAR
