@@ -27,7 +27,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import static com.tommsy.smartmoving.client.renderer.RenderUtils.RadianToAngle;
 
 public class ModelEarsRenderer extends ModelSpecialRenderer {
-    private int _i = 0;
     private EntityPlayer entityplayer;
 
     public ModelEarsRenderer(ModelBase modelBase, int texOffX, int texOffY, ModelRotationRenderer baseRenderer) {
@@ -44,6 +43,8 @@ public class ModelEarsRenderer extends ModelSpecialRenderer {
         reset();
         super.doRender(f, useParentTransformations);
     }
+
+    private int _i = 0;
 
     @Override
     public void preTransform(float factor, boolean push) {

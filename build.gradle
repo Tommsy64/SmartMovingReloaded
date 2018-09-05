@@ -73,7 +73,7 @@ repositories {
 
 sourceSets {
     main {
-        ext.refMap = "mixins.smartmoving.refmap.json"
+        ext.refMap = 'mixins.smartmoving.refmap.json'
     }
 }
 

@@ -129,7 +129,7 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
             boolean canCrawl = this.fallDistance < SmartMovingConfigAccess.config.movement.fallingDistanceStart;
             if (canCrawl) {
                 if (playerState.isCrawling)
-                    playerState.isCrawling = playerInput.grab.pressed;
+                    playerState.isCrawling = playerInput.sneak.pressed;
                 else
                     playerState.isCrawling = (playerInput.grab.startPressed && playerInput.sneak.pressed && this.onGround) && !this.capabilities.isFlying;
             } else

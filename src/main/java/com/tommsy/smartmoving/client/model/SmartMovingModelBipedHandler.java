@@ -21,6 +21,9 @@ package com.tommsy.smartmoving.client.model;
 import java.util.List;
 import java.util.Random;
 
+import lombok.NonNull;
+import lombok.Setter;
+
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -79,12 +82,17 @@ public class SmartMovingModelBipedHandler {
      */
     public boolean isBeingRenderedInInventory;
 
-    private ScaleType scaleArmType, scaleLegType;
+    @Setter
+    @NonNull
+    private ScaleType scaleArm = ScaleType.Scale, scaleLeg = ScaleType.Scale;
 
     public SmartMovingModelBipedHandler(SmartMovingModelBiped smModel) {
         this(smModel, true);
     }
 
+    /**
+     * Make sure to call {@link #initialize()} after construction.
+     */
     protected SmartMovingModelBipedHandler(SmartMovingModelBiped smModel, final boolean doGLMatrixPop) {
         model = (this.smModel = smModel).getImplementation();
         this.doGLMatrixPop = doGLMatrixPop;
@@ -158,10 +166,9 @@ public class SmartMovingModelBipedHandler {
         popMatrix();
     }
 
-    // Probably shouldn't be field
-    private boolean isStandardAnimation;
-
     /**
+     * @param totalHorizontalDistance The total, accumulated distance the entity has moved
+     * @param currentHorizontalSpeed The entity's magnitude of horizontal velocity.
      * @return True if {@linkplain ModelBiped#setRotationAngles(float, float, float, float, float, float, Entity)} should not be called
      */
     public boolean preSetRotationAngles(float totalHorizontalDistance, float currentHorizontalSpeed, float ageInTicks, float headYawAngle, float headPitchAngle, float scaleFactor,
@@ -196,14 +203,15 @@ public class SmartMovingModelBipedHandler {
         bipedOuter.rotateAngleY = rotationYaw / RadianToAngle;
         bipedOuter.fadeRotateAngleY = !player.isRiding();
 
-        isStandardAnimation = false;
+        boolean isStandardAnimation = false;
 
         // Handle smart moving state...
 
         final float partialTicks = ageInTicks - player.ticksExisted;
 
-        float diffX = (float) (entity.posX - entity.prevPosX), diffZ = (float) (entity.posZ - entity.prevPosZ);
-        final float horizontalSpeed = MathHelper.sqrt(diffX * diffX + diffZ * diffZ);
+        // TODO: The original smart moving takes a moving average of the horizontal speed to get a smoother value.
+        // float diffX = (float) (entity.posX - entity.prevPosX), diffZ = (float) (entity.posZ - entity.prevPosZ);
+        final float horizontalSpeed = currentHorizontalSpeed; // MathHelper.sqrt(diffX * diffX + diffZ * diffZ);
 
         SmartMovingAbstractClientPlayer smPlayer = (SmartMovingAbstractClientPlayer) player;
         SmartMovingPlayerState state = smPlayer.getState();
@@ -212,34 +220,50 @@ public class SmartMovingModelBipedHandler {
             float walkFactor = factor(horizontalSpeed, 0F, 0.12951545F);
             float standFactor = factor(horizontalSpeed, 0.12951545F, 0F);
 
-            bipedTorso.offsetZ = -0.87f;
+            bipedTorso.rotationOrder = RotationOrder.YZX; // Change the rotation order to match the new horizontal orientation
 
-            bipedHead.rotateAngleZ = -headYawAngle / RadianToAngle;
-            bipedHead.rotateAngleX = -Eighth;
-            bipedHead.rotationPointZ = -2F;
+            bipedTorso.offsetZ = -0.935f; // Shifts entire player toward the ground
 
-            bipedTorso.rotationOrder = RotationOrder.YZX;
-            bipedTorso.rotateAngleX = Quarter - Thirtysecond;
-            bipedTorso.rotationPointY = 3F;
-            bipedTorso.rotateAngleZ = MathHelper.cos(distance + Quarter) * Sixtyfourth * walkFactor;
-            bipedBody.rotateAngleY = MathHelper.cos(distance + Half) * Sixtyfourth * walkFactor;
+            bipedTorso.rotateAngleX = Quarter - Thirtysecond; // Tilt player to be horizontal
+            // Because the rotation order is changed above from XYZ to YZX, rotationPoint Y affects rotateAngle X; point Y, angle Z; point Z, angle X
+            bipedTorso.rotationPointY = 3F; // Adjust the rotation point so that the body actually touches the ground
+            bipedTorso.rotateAngleZ = MathHelper.cos(distance + Quarter) * Sixtyfourth * walkFactor; // Roll torso (and everything attached to it) back and forth a bit
 
-            bipedRightLeg.rotateAngleX = (MathHelper.cos(distance - Quarter) * Sixtyfourth + Thirtysecond) * walkFactor + Thirtysecond * standFactor;
-            bipedLeftLeg.rotateAngleX = (MathHelper.cos(distance - Half - Quarter) * Sixtyfourth + Thirtysecond) * walkFactor + Thirtysecond * standFactor;
+            bipedBody.rotateAngleY = MathHelper.cos(distance + Half) * Sixtyfourth * walkFactor; // Roll body back and forth a bit
+
+            bipedHead.rotateAngleZ = -headYawAngle / RadianToAngle; // Left to right rotation of head
+            bipedHead.rotationPointZ = -1.5F; // Shifts the head a little bit closer to the chest/ground
+
+            bipedHead.rotateAngleX = -Eighth; // Rotates head toward the ground
+
+            // Leg X rotation picks the leg off the ground, making it look like it is pushing/pulling it
+
+            float legRotateXOne = (MathHelper.cos(distance - Quarter) * Sixtyfourth + Thirtysecond) * walkFactor + Thirtysecond * standFactor;
+            float legRotateXTwo = (MathHelper.cos(distance - Half - Quarter) * Sixtyfourth + Thirtysecond) * walkFactor + Thirtysecond * standFactor;
+
+            // When moving forward, legs push the ground; when moving backward, legs pull on the ground.
+            if (player.moveForward >= 0) {
+                bipedRightLeg.rotateAngleX = legRotateXOne;
+                bipedLeftLeg.rotateAngleX = legRotateXTwo;
+            } else {
+                bipedRightLeg.rotateAngleX = legRotateXTwo;
+                bipedLeftLeg.rotateAngleX = legRotateXOne;
+            }
 
             bipedRightLeg.rotateAngleZ = (MathHelper.cos(distance - Quarter) + 1F) * 0.25F * walkFactor + Thirtysecond * standFactor;
             bipedLeftLeg.rotateAngleZ = (MathHelper.cos(distance - Quarter) - 1F) * 0.25F * walkFactor - Thirtysecond * standFactor;
 
-            if (scaleLegType != ScaleType.NoScaleStart)
+            // Makes knees look like they are bending
+            if (scaleLeg != ScaleType.NoScaleStart)
                 setLegScales(
-                        1F + (MathHelper.cos(distance + Quarter - Quarter) - 1F) * 0.25F * walkFactor,
-                        1F + (MathHelper.cos(distance - Quarter - Quarter) - 1F) * 0.25F * walkFactor);
+                        0.95F + (MathHelper.cos(distance + Quarter - Quarter) - 1F) * 0.25F * walkFactor,
+                        0.95F + (MathHelper.cos(distance - Quarter - Quarter) - 1F) * 0.25F * walkFactor);
 
             bipedRightArm.rotationOrder = RotationOrder.YZX;
             bipedLeftArm.rotationOrder = RotationOrder.YZX;
 
-            bipedRightArm.rotateAngleX = Half + Eighth;
-            bipedLeftArm.rotateAngleX = Half + Eighth;
+            bipedRightArm.rotateAngleX = Half + Eighth - Thirtysecond;
+            bipedLeftArm.rotateAngleX = Half + Eighth - Thirtysecond;
 
             bipedRightArm.rotateAngleZ = ((MathHelper.cos(distance + Half)) * Sixtyfourth + Thirtysecond) * walkFactor + Sixteenth * standFactor;
             bipedLeftArm.rotateAngleZ = ((MathHelper.cos(distance + Half)) * Sixtyfourth - Thirtysecond) * walkFactor - Sixteenth * standFactor;
@@ -247,19 +271,20 @@ public class SmartMovingModelBipedHandler {
             bipedRightArm.rotateAngleY = -Quarter;
             bipedLeftArm.rotateAngleY = Quarter;
 
-            if (scaleArmType != ScaleType.NoScaleStart)
+            // Makes arms look like they are being picked up and put back on the ground
+            if (scaleArm != ScaleType.NoScaleStart)
                 setArmScales(
-                        1F + (MathHelper.cos(distance + Quarter) - 1F) * 0.15F * walkFactor,
-                        1F + (MathHelper.cos(distance - Quarter) - 1F) * 0.15F * walkFactor);
+                        0.95F + (MathHelper.cos(distance + Quarter) - 1F) * 0.15F * walkFactor,
+                        0.95F + (MathHelper.cos(distance - Quarter) - 1F) * 0.15F * walkFactor);
         } else if (player.isElytraFlying())
             animateElytraFlying((EntityLivingBase) entity, partialTicks, ageInTicks);
         else
             isStandardAnimation = true;
 
-        animateHeadRotation(headYawAngle, headPitchAngle, player.isElytraFlying());
+        animateHeadRotation(isStandardAnimation, headYawAngle, headPitchAngle, player.isElytraFlying());
 
         if (player.isPlayerSleeping())
-            animateSleeping();
+            animateSleeping(isStandardAnimation);
 
         float elytraMagnitude = player.getTicksElytraFlying() > 4 ? getElytraMagnitude(entity) : 1;
         if (isStandardAnimation || elytraMagnitude != 1) {
@@ -267,22 +292,21 @@ public class SmartMovingModelBipedHandler {
         }
 
         if (model.isRiding)
-            animateRiding();
+            animateRiding(isStandardAnimation);
 
         if (model.leftArmPose == ModelBiped.ArmPose.ITEM)
-            this.animateLeftArmItemHolding();
+            this.animateLeftArmItemHolding(isStandardAnimation);
 
         if (model.rightArmPose == ModelBiped.ArmPose.ITEM)
-            this.animateRightArmItemHolding();
+            this.animateRightArmItemHolding(isStandardAnimation);
 
         if (model.swingProgress > 0F)
             animateSwinging(entity);
         if (model.isSneak)
-            animateSneaking();
+            animateSneaking(isStandardAnimation);
 
-        animateArms(ageInTicks);
+        animateArms(isStandardAnimation, ageInTicks);
 
-        // Should this be || or &&?
         if (model.rightArmPose == ModelBiped.ArmPose.BOW_AND_ARROW)
             animateBowAimingRight(ageInTicks);
         else if (model.leftArmPose == ModelBiped.ArmPose.BOW_AND_ARROW)
@@ -301,7 +325,7 @@ public class SmartMovingModelBipedHandler {
         return true;
     }
 
-    private float getElytraMagnitude(Entity entity) {
+    private static float getElytraMagnitude(Entity entity) {
         float f = (float) (entity.motionX * entity.motionX + entity.motionY * entity.motionY + entity.motionZ * entity.motionZ);
         f = f / 0.2F;
         f = f * f * f;
@@ -343,14 +367,14 @@ public class SmartMovingModelBipedHandler {
             GL11.glPopMatrix();
     }
 
-    private void animateHeadRotation(float headYawAngle, float headPitchAngle, boolean elytraFlying) {
+    private void animateHeadRotation(boolean isStandardAnimation, float headYawAngle, float headPitchAngle, boolean elytraFlying) {
         if (!isStandardAnimation) { return; }
         bipedNeck.ignoreBase = !elytraFlying;
         bipedHead.rotateAngleY = (elytraFlying ? 0 : rotationYaw + headYawAngle) / RadianToAngle;
         bipedHead.rotateAngleX = elytraFlying ? -Eighth : headPitchAngle / RadianToAngle;
     }
 
-    private void animateSleeping() {
+    private void animateSleeping(boolean isStandardAnimation) {
         if (!isStandardAnimation) { return; }
         bipedNeck.ignoreBase = false;
         bipedHead.rotateAngleY = 0F;
@@ -366,7 +390,7 @@ public class SmartMovingModelBipedHandler {
         bipedLeftLeg.rotateAngleX = MathHelper.cos(totalHorizontalDistance * 0.6662F + Half) * 1.4F * currentHorizontalSpeed / elytraMagnitude;
     }
 
-    private void animateRiding() {
+    private void animateRiding(boolean isStandardAnimation) {
         if (!isStandardAnimation) { return; }
         bipedRightArm.rotateAngleX += -0.6283185F;
         bipedLeftArm.rotateAngleX += -0.6283185F;
@@ -376,12 +400,12 @@ public class SmartMovingModelBipedHandler {
         bipedLeftLeg.rotateAngleY = -0.3141593F;
     }
 
-    private void animateLeftArmItemHolding() {
+    private void animateLeftArmItemHolding(boolean isStandardAnimation) {
         if (!isStandardAnimation) { return; }
         bipedLeftArm.rotateAngleX = bipedLeftArm.rotateAngleX * 0.5F - 0.3141593F;
     }
 
-    private void animateRightArmItemHolding() {
+    private void animateRightArmItemHolding(boolean isStandardAnimation) {
         if (!isStandardAnimation) { return; }
         bipedRightArm.rotateAngleX = bipedRightArm.rotateAngleX * 0.5F - 0.3141593F;
     }
@@ -409,7 +433,7 @@ public class SmartMovingModelBipedHandler {
         modelrenderer.rotateAngleZ += MathHelper.sin(model.swingProgress * Half) * -0.4F;
     }
 
-    private void animateSneaking() {
+    private void animateSneaking(boolean isStandardAnimation) {
         if (!isStandardAnimation) { return; }
         bipedTorso.rotateAngleX += 0.5F;
         bipedRightLeg.rotateAngleX += -0.5F;
@@ -426,7 +450,7 @@ public class SmartMovingModelBipedHandler {
         bipedNeck.offsetY = 0.0621F;
     }
 
-    private void animateArms(float totalTime) {
+    private void animateArms(boolean isStandardAnimation, float totalTime) {
         if (!isStandardAnimation) { return; }
         bipedRightArm.rotateAngleZ += MathHelper.cos(totalTime * 0.09F) * 0.05F + 0.05F;
         bipedLeftArm.rotateAngleZ -= MathHelper.cos(totalTime * 0.09F) * 0.05F + 0.05F;
@@ -484,38 +508,38 @@ public class SmartMovingModelBipedHandler {
     }
 
     private void setArmScales(float rightScale, float leftScale) {
-        if (scaleArmType == ScaleType.Scale) {
+        if (scaleArm == ScaleType.Scale) {
             bipedRightArm.scaleY = rightScale;
             bipedLeftArm.scaleY = leftScale;
-        } else if (scaleArmType == ScaleType.NoScaleEnd) {
+        } else if (scaleArm == ScaleType.NoScaleEnd) {
             bipedRightArm.offsetY -= (1F - rightScale) * 0.5F;
             bipedLeftArm.offsetY -= (1F - leftScale) * 0.5F;
         }
     }
 
     private void setLegScales(float rightScale, float leftScale) {
-        if (scaleLegType == ScaleType.Scale) {
+        if (scaleLeg == ScaleType.Scale) {
             bipedRightLeg.scaleY = rightScale;
             bipedLeftLeg.scaleY = leftScale;
-        } else if (scaleLegType == ScaleType.NoScaleEnd) {
+        } else if (scaleLeg == ScaleType.NoScaleEnd) {
             bipedRightLeg.offsetY -= (1F - rightScale) * 0.5F;
             bipedLeftLeg.offsetY -= (1F - leftScale) * 0.5F;
         }
     }
 
-    private static float factor(float x, float x0, float x1) {
-        if (x0 > x1) {
-            if (x <= x1)
+    private static float factor(float a, float b, float c) {
+        if (b > c) {
+            if (a <= c)
                 return 1F;
-            if (x >= x0)
+            if (a >= b)
                 return 0F;
-            return (x0 - x) / (x0 - x1);
+            return (b - a) / (b - c);
         } else {
-            if (x >= x1)
+            if (a >= c)
                 return 1F;
-            if (x <= x0)
+            if (a <= b)
                 return 0F;
-            return (x - x0) / (x1 - x0);
+            return (a - b) / (c - b);
         }
     }
 
@@ -525,9 +549,9 @@ public class SmartMovingModelBipedHandler {
 
     public ModelRenderer getRandomModelBox(Random rand) {
         List<ModelRenderer> boxList = model.boxList;
-        int size = boxList.size();
+        final int size = boxList.size();
         int renderersWithBoxes = 0;
-        int[] stack = new int[size + 1];
+        final int[] stack = new int[size + 1];
 
         for (int i = 0; i < size; i++) {
             ModelRenderer renderer = boxList.get(i);
@@ -535,14 +559,8 @@ public class SmartMovingModelBipedHandler {
                 stack[renderersWithBoxes++] = i;
         }
 
-        if (renderersWithBoxes != 0) {
-            int randInt = rand.nextInt(renderersWithBoxes);
-            for (int i = 0; i < renderersWithBoxes; i++) {
-                ModelRenderer renderer = boxList.get(stack[i]);
-                if (i == randInt)
-                    return renderer;
-            }
-        }
+        if (renderersWithBoxes != 0)
+            return boxList.get(stack[rand.nextInt(renderersWithBoxes)]);
 
         return null;
     }

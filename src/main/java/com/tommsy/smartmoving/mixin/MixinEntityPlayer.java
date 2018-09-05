@@ -123,8 +123,10 @@ public abstract class MixinEntityPlayer extends MixinEntityLivingBase implements
     public float getEyeHeight() {
         if (this.isPlayerSleeping())
             return 0.2F;
-        else if (this.isElytraFlying() || playerState.isCrawling)
+        else if (this.isElytraFlying())
             return 0.4F;
+        else if (playerState.isCrawling)
+            return eyeHeight - 1;
         else if (!this.isSneaking() && this.height != 1.65F)
             return this.height == 0.6F ? 0.4F : eyeHeight;
 

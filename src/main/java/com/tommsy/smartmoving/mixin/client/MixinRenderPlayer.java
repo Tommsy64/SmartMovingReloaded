@@ -46,6 +46,7 @@ import com.tommsy.smartmoving.client.model.SmartMovingModelPlayer;
 import com.tommsy.smartmoving.client.model.SmartMovingModelPlayerHandler;
 import com.tommsy.smartmoving.client.renderer.ModelCapeRenderer;
 import com.tommsy.smartmoving.client.renderer.ModelEarsRenderer;
+import com.tommsy.smartmoving.client.renderer.ScaleType;
 import com.tommsy.smartmoving.client.renderer.layers.LayerPlayerArmor;
 import com.tommsy.smartmoving.client.renderer.layers.SmartMovingLayerElytra;
 
@@ -66,6 +67,12 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
         LayerPlayerArmor layerPlayerArmor = new LayerPlayerArmor(this);
         modelArmor = ((ModelPlayerArmor) layerPlayerArmor.modelArmor).getHandler();
         modelLeggings = ((ModelPlayerArmor) layerPlayerArmor.modelLeggings).getHandler();
+
+        modelLeggings.setScaleArm(ScaleType.NoScaleStart);
+        modelLeggings.setScaleLeg(ScaleType.NoScaleEnd);
+        modelArmor.setScaleArm(ScaleType.NoScaleStart);
+        modelArmor.setScaleLeg(ScaleType.Scale);
+
         return layerPlayerArmor;
     }
 
@@ -133,8 +140,8 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
     }
 
     @Redirect(method = "applyRotations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderLivingBase;applyRotations(Lnet/minecraft/entity/EntityLivingBase;FFF)V"), require = 2)
-    private void zeroRotationYaw(RenderLivingBase<AbstractClientPlayer> $this, EntityLivingBase entityLiving, float p_77043_2_, float rotationYaw, float partialTicks) {
-        super.applyRotations((AbstractClientPlayer) entityLiving, p_77043_2_, 0, partialTicks);
+    private void zeroRotationYaw(RenderLivingBase<AbstractClientPlayer> $this, EntityLivingBase entityLiving, float ageInTicks, float rotationYaw, float partialTicks) {
+        super.applyRotations((AbstractClientPlayer) entityLiving, ageInTicks, 0, partialTicks);
     }
 
     @Redirect(method = "applyRotations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;isElytraFlying()Z"))
@@ -164,7 +171,7 @@ public abstract class MixinRenderPlayer extends RenderLivingBase<AbstractClientP
     }
 
     /**
-     * Defines what float the third param in setRotationAngles of ModelBase is
+     * Defines what float the third parameter in setRotationAngles of ModelBase is.
      */
     @Override
     protected float handleRotationFloat(AbstractClientPlayer entityClientPlayer, float partialTicks) {
