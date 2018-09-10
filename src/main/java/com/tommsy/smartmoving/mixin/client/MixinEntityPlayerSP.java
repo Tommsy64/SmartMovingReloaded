@@ -89,6 +89,16 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
     @Inject(method = "onUpdate", at = @At("RETURN"))
     private void postOnUpdate(CallbackInfo ci) {
 
+        float landMovementFactor = this.getAIMoveSpeed();
+        float perspectiveFactor = landMovementFactor;
+        if (playerState.isSprinting) {
+            if (this.isSprinting())
+                perspectiveFactor /= 1.3F;
+            perspectiveFactor = perspectiveFactor * 1.5F; // TODO: Options._perspectiveSprintFactor.value;
+        } else if (playerState.isRunning)
+            perspectiveFactor *= 1F; // TODO: Options._perspectiveRunFactor.value;
+
+        fadingPerspectiveFactor += (perspectiveFactor - fadingPerspectiveFactor) * 0.5F; // TODO: Options._perspectiveFadeFactor.value;
     }
 
     @Inject(method = "onLivingUpdate", at = @At("HEAD"))
@@ -120,10 +130,14 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
         if (this.isElytraFlying())
             playerState.isCrawling = playerState.isCrouching = false;
 
+        boolean movingForward = this.movementInput.moveForward > 0;
+
+        boolean isSprinting = playerInput.sprint.pressed && movingForward && !this.isBurning()
+                && (SmartMovingConfigAccess.config.movement.sprintDuringItemUsage || this.getItemInUseCount() < 1);
+
         boolean mustCrawl = false;
-        if (playerState.isCrawling) {
+        if (playerState.isCrawling)
             mustCrawl = checkForCollision(0.6F, 1.8F);
-        }
 
         if (!mustCrawl) {
             boolean canCrawl = this.fallDistance < SmartMovingConfigAccess.config.movement.fallingDistanceStart;
@@ -137,6 +151,8 @@ public abstract class MixinEntityPlayerSP extends MixinAbstractClientPlayer impl
         }
 
         playerState.isCrouching = !playerState.isCrawling && playerInput.sneak.pressed;
+        playerState.isSprinting = !playerState.isCrouching && isSprinting;
+        playerState.isRunning = this.isSprinting() && !isSprinting;
 
         sendPlayerState();
     }

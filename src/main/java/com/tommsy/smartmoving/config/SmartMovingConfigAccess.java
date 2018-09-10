@@ -62,6 +62,9 @@ public final class SmartMovingConfigAccess {
             @Comment("Fall distance for stopping ground based moves like crawling or sliding (>= 0)")
             @RangeDouble(min = 0)
             public float fallingDistanceStart = 3;
+
+            @Comment("Whether the player be able to sprint while using an item.")
+            public boolean sprintDuringItemUsage = true;
         }
     }
 

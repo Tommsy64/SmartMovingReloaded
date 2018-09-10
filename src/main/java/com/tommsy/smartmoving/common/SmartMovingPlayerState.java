@@ -26,6 +26,9 @@ import io.netty.buffer.ByteBuf;
 @ToString
 @EqualsAndHashCode
 public class SmartMovingPlayerState {
+    public boolean isRunning;
+    public boolean isSprinting;
+
     public boolean isCrawling;
     public boolean isCrouching;
 
@@ -34,16 +37,25 @@ public class SmartMovingPlayerState {
     }
 
     public void copy(SmartMovingPlayerState other) {
+        this.isRunning = other.isRunning;
+        this.isSprinting = other.isSprinting;
+
         this.isCrawling = other.isCrawling;
         this.isCrouching = other.isCrouching;
     }
 
     public void writeToBuffer(ByteBuf buf) {
+        buf.writeBoolean(isRunning);
+        buf.writeBoolean(isSprinting);
+
         buf.writeBoolean(isCrawling);
         buf.writeBoolean(isCrouching);
     }
 
     public void readFromBuffer(ByteBuf buf) {
+        this.isRunning = buf.readBoolean();
+        this.isSprinting = buf.readBoolean();
+
         this.isCrawling = buf.readBoolean();
         this.isCrouching = buf.readBoolean();
     }
